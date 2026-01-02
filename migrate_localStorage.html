@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migrate LocalStorage Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+        }
+
+        .info {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+
+        .button:hover {
+            opacity: 0.9;
+        }
+
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: block;
+        }
+
+        .user-list {
+            margin: 20px 0;
+        }
+
+        .user-item {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+
+        #apiUrl {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 1em;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Migrate LocalStorage Data</h1>
+
+        <div class="info">
+            <strong>Important:</strong> This tool will migrate your bingo data from the old localStorage-based version to the new Flask backend.
+            <br><br>
+            <strong>Instructions:</strong>
+            <ol>
+                <li>Open the OLD version of the bucket list bingo (the original HTML file)</li>
+                <li>Keep that page open in another tab</li>
+                <li>Come back to this page and click "Detect LocalStorage Data"</li>
+                <li>If data is found, click "Migrate to Backend"</li>
+            </ol>
+        </div>
+
+        <div class="form-section">
+            <label for="apiUrl"><strong>Backend API URL:</strong></label>
+            <input type="text" id="apiUrl" value="http://localhost:5000" placeholder="http://localhost:5000">
+            <small style="color: #666;">Enter the URL where your Flask backend is running (default: http://localhost:5000)</small>
+        </div>
+
+        <button class="button" onclick="detectData()">🔍 Detect LocalStorage Data</button>
+
+        <div id="status" class="status"></div>
+
+        <div id="userList" class="user-list" style="display: none;">
+            <h3>Found Users:</h3>
+            <div id="users"></div>
+            <button class="button" onclick="migrateData()">✅ Migrate to Backend</button>
+        </div>
+    </div>
+
+    <script>
+        let foundData = null;
+
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `status ${type}`;
+            statusDiv.innerHTML = message;
+        }
+
+        function detectData() {
+            try {
+                const USERS_KEY = 'bucketBingoUsers';
+                const usersJson = localStorage.getItem(USERS_KEY);
+
+                if (!usersJson) {
+                    showStatus('❌ No localStorage data found. Make sure you have the old version open in another tab or have used it before on this browser.', 'error');
+                    document.getElementById('userList').style.display = 'none';
+                    return;
+                }
+
+                const users = JSON.parse(usersJson);
+
+                if (users.length === 0) {
+                    showStatus('⚠️ Found users list but it is empty.', 'error');
+                    document.getElementById('userList').style.display = 'none';
+                    return;
+                }
+
+                // Collect full user data
+                foundData = users.map(user => {
+                    const dataKey = `bucketBingo_${user.id}_data`;
+                    const progressKey = `bucketBingo_${user.id}_progress`;
+                    const randomizedKey = `bucketBingo_${user.id}_randomized`;
+
+                    const dataJson = localStorage.getItem(dataKey);
+                    const progressJson = localStorage.getItem(progressKey);
+                    const randomized = localStorage.getItem(randomizedKey) === 'true';
+
+                    return {
+                        user: user,
+                        bingoData: dataJson ? JSON.parse(dataJson) : null,
+                        progress: progressJson ? JSON.parse(progressJson) : [],
+                        randomized: randomized
+                    };
+                });
+
+                // Display found users
+                const usersHtml = foundData.map(data => `
+                    <div class="user-item">
+                        <strong>${data.user.name}</strong><br>
+                        <small>Created: ${new Date(data.user.createdAt).toLocaleString()}</small><br>
+                        <small>Items: ${data.bingoData ? data.bingoData.items.length : 0} | Progress: ${data.progress.length} marked</small>
+                    </div>
+                `).join('');
+
+                document.getElementById('users').innerHTML = usersHtml;
+                document.getElementById('userList').style.display = 'block';
+
+                showStatus(`✅ Found ${users.length} user(s) in localStorage! Click "Migrate to Backend" to transfer the data.`, 'success');
+
+            } catch (error) {
+                showStatus(`❌ Error detecting data: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        async function migrateData() {
+            if (!foundData || foundData.length === 0) {
+                showStatus('❌ No data to migrate. Click "Detect LocalStorage Data" first.', 'error');
+                return;
+            }
+
+            const apiUrl = document.getElementById('apiUrl').value.trim();
+            if (!apiUrl) {
+                showStatus('❌ Please enter the Backend API URL.', 'error');
+                return;
+            }
+
+            showStatus('🔄 Migrating data to backend...', 'info');
+
+            let successCount = 0;
+            let errorCount = 0;
+            const errors = [];
+
+            for (const data of foundData) {
+                try {
+                    // Create user via API
+                    const response = await fetch(`${apiUrl}/api/users`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data.bingoData)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Failed to create user: ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    const newUserId = result.user.id;
+
+                    // Update progress if exists
+                    if (data.progress.length > 0 || data.randomized) {
+                        await fetch(`${apiUrl}/api/users/${newUserId}/progress`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                markedCells: data.progress,
+                                randomized: data.randomized
+                            })
+                        });
+                    }
+
+                    successCount++;
+                } catch (error) {
+                    errorCount++;
+                    errors.push(`${data.user.name}: ${error.message}`);
+                    console.error(`Error migrating ${data.user.name}:`, error);
+                }
+            }
+
+            if (errorCount === 0) {
+                showStatus(`✅ Successfully migrated ${successCount} user(s) to the backend!<br><br>
+                    You can now use the new version at <a href="${apiUrl}" target="_blank">${apiUrl}</a>`, 'success');
+            } else {
+                showStatus(`⚠️ Migration completed with some errors:<br>
+                    ✅ Success: ${successCount} user(s)<br>
+                    ❌ Errors: ${errorCount} user(s)<br><br>
+                    Errors:<br>${errors.join('<br>')}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

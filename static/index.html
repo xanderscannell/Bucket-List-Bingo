@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingo Bucket List</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 0;
+        }
+
+        .navbar {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-button {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .nav-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-button.active {
+            background: white;
+            color: #667eea;
+        }
+
+        .main-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 60px);
+            padding: 20px;
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        .container {
+            background: white;
+            padding: 15px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 800px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 5px;
+            font-size: 1.5em;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #764ba2;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        .bingo-card {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .bingo-cell {
+            aspect-ratio: 1;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 4px;
+            font-size: 1.0em !important;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            line-height: 1.2;
+            font-weight: bold;
+            text-transform: uppercase;
+            overflow: hidden;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+
+        .bingo-cell.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .bingo-cell:active {
+            background: #f0f4ff;
+            transform: scale(0.95);
+        }
+
+        .bingo-cell.marked {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+        }
+
+        .bingo-cell.marked::after {
+            content: '✓';
+            position: absolute;
+            font-size: 2em;
+            opacity: 0.3;
+        }
+
+        .free-space {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+            font-weight: bold;
+            font-size: 0.8em;
+            cursor: default;
+        }
+
+        .free-space:active {
+            transform: none;
+        }
+
+        .instructions {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin-top: 15px;
+            font-size: 0.85em;
+            line-height: 1.4;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .reset-button, .print-button, .clear-button {
+            padding: 10px 20px;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .reset-button {
+            background: #764ba2;
+        }
+
+        .reset-button:active {
+            background: #667eea;
+        }
+
+        .print-button {
+            background: #667eea;
+        }
+
+        .print-button:active {
+            background: #764ba2;
+        }
+
+        .clear-button {
+            background: #dc3545;
+        }
+
+        .clear-button:active {
+            background: #c82333;
+        }
+
+        /* Tablet and larger screens */
+        @media (min-width: 600px) {
+            .container {
+                padding: 30px;
+            }
+
+            h1 {
+                font-size: 2em;
+                margin-bottom: 10px;
+            }
+
+            .subtitle {
+                font-size: 1.2em;
+                margin-bottom: 30px;
+            }
+
+            .bingo-card {
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            .bingo-cell {
+                border: 3px solid #667eea;
+                border-radius: 10px;
+                padding: 10px;
+                font-size: 0.85em;
+            }
+
+            .bingo-cell:hover {
+                background: #f0f4ff;
+                transform: scale(1.05);
+            }
+
+            .bingo-cell.marked::after {
+                font-size: 3em;
+            }
+
+            .free-space {
+                font-size: 1.2em;
+            }
+
+            .free-space:hover {
+                transform: none;
+            }
+
+            .instructions {
+                margin-top: 20px;
+                font-size: 1em;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+
+            .container {
+                box-shadow: none;
+                padding: 20px;
+                max-width: 100%;
+            }
+
+            .buttons {
+                display: none;
+            }
+
+            .randomize-button {
+                display: none !important;
+            }
+
+            .bingo-card {
+                gap: 8px;
+                page-break-inside: avoid;
+            }
+
+            .bingo-cell {
+                border: 2px solid #333;
+                font-size: 0.7em;
+                padding: 8px;
+                page-break-inside: avoid;
+            }
+
+            .bingo-cell.marked {
+                background: #e0e0e0 !important;
+                color: #333 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .bingo-cell.marked::after {
+                color: #333;
+                opacity: 0.5;
+            }
+
+            .free-space {
+                background: #f0f0f0 !important;
+                color: #333 !important;
+                border: 2px solid #333;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            h1 {
+                color: #333;
+            }
+
+            .subtitle {
+                color: #666;
+            }
+
+            .instructions {
+                font-size: 0.85em;
+            }
+
+            .no-print {
+                display: none;
+            }
+
+            .navbar {
+                display: none;
+            }
+        }
+
+        /* Creator-specific styles */
+        .form-section {
+            margin-bottom: 25px;
+        }
+
+        .form-section label {
+            display: block;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .form-section input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+        }
+
+        .form-section input:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .item-input {
+            position: relative;
+        }
+
+        .item-input label {
+            display: block;
+            color: #666;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+            font-weight: normal;
+        }
+
+        .item-input input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-family: inherit;
+        }
+
+        .item-input input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .create-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .create-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .create-button:active {
+            transform: translateY(0);
+        }
+
+        .randomize-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 20px;
+        }
+
+        .randomize-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .randomize-button:active {
+            transform: translateY(0);
+        }
+
+        .randomize-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .helper-text {
+            text-align: center;
+            color: #666;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 15px;
+        }
+
+        /* Dev Mode styles */
+        .dev-panel {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+        }
+
+        .dev-panel.active {
+            display: block;
+        }
+
+        .dev-panel h3 {
+            margin-top: 0;
+            color: #667eea;
+            font-size: 1em;
+        }
+
+        .dev-button {
+            padding: 8px 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.85em;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .dev-button:active {
+            background: #764ba2;
+        }
+
+        /* Animation styles */
+        .bingo-cell.highlight {
+            background: #ffd700 !important;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            z-index: 10;
+            position: relative;
+        }
+
+        .bingo-cell.swapping {
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @media (min-width: 600px) {
+            .items-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* User list styles */
+        .user-card {
+            background: #f8f9fa;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-card:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .user-card.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #764ba2;
+        }
+
+        .user-info h3 {
+            margin: 0 0 5px 0;
+            color: inherit;
+        }
+
+        .user-info p {
+            margin: 0;
+            font-size: 0.85em;
+            opacity: 0.8;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .delete-user-btn {
+            padding: 8px 15px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: background 0.2s;
+        }
+
+        .delete-user-btn:hover {
+            background: #c82333;
+        }
+
+        .user-card.active .delete-user-btn {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .user-card.active .delete-user-btn:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .no-users-message {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px 20px;
+        }
+
+        .loading-message {
+            text-align: center;
+            color: #667eea;
+            padding: 40px 20px;
+            font-size: 1.2em;
+        }
+
+        /* Statistics view styles */
+        .statistics-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 600px) {
+            .statistics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 900px) {
+            .statistics-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1400px) {
+            .statistics-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .user-bingo-card-container {
+            background: #f8f9fa;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 12px;
+            transition: all 0.3s;
+        }
+
+        .user-bingo-card-container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .user-bingo-card-container h3 {
+            margin: 0 0 10px 0;
+            color: #667eea;
+            text-align: center;
+            font-size: 1em;
+        }
+
+        .mini-bingo-card {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 2px;
+            margin-bottom: 5px;
+        }
+
+        .mini-bingo-cell {
+            aspect-ratio: 1;
+            border: 1px solid #667eea;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2px;
+            font-size: 0.28em;
+            background: white;
+            line-height: 1.05;
+            font-weight: bold;
+            text-transform: uppercase;
+            overflow: hidden;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+
+        .mini-bingo-cell.marked {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .mini-bingo-cell.marked::after {
+            content: '✓';
+            position: absolute;
+            font-size: 1.2em;
+            opacity: 0.4;
+        }
+
+        .mini-free-space {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+            font-size: 0.4em;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar no-print">
+        <button class="nav-button" onclick="switchView('creator')">Create New Card</button>
+        <button class="nav-button" onclick="switchView('card')">Bingo Card</button>
+        <button class="nav-button" onclick="switchView('users')">Switch User</button>
+        <button class="nav-button" onclick="switchView('statistics')">Statistics</button>
+    </div>
+
+    <div class="main-content">
+        <!-- Bingo Card View -->
+        <div id="cardView" class="view">
+            <div class="container">
+                <h1 id="cardTitle">2026 Bingo Bucket List</h1>
+                <div class="subtitle no-print">Click to mark completed!</div>
+
+                <div class="bingo-card" id="bingoCard">
+                    <!-- Cells will be generated by JavaScript -->
+                </div>
+
+                <div class="instructions">
+                    Tap each square as you complete your bucket list items!<br>
+                    Try to get 5 in a row - horizontal, vertical, or diagonal!<br>
+                    <span class="no-print">Your progress is synced automatically across all devices.</span>
+                </div>
+
+                <button class="randomize-button no-print" onclick="visualRandomizeCard()">Randomize!</button>
+
+                <div class="buttons">
+                    <button class="print-button" onclick="window.print()">Print</button>
+                    <button class="reset-button" onclick="resetProgress()">Reset All Progress</button>
+                    <button class="clear-button" onclick="clearBingoCard()">Clear Bingo Card</button>
+                </div>
+
+                <!-- Dev Mode Panel (hidden by default) -->
+                <div id="devPanel" class="dev-panel no-print">
+                    <h3>Developer Mode</h3>
+                    <button class="dev-button" onclick="visualRandomizeCard()">Visual Randomizer</button>
+                    <button class="dev-button" onclick="randomizeCard()">Instant Randomize</button>
+                    <button class="dev-button" onclick="fillAllItems()">Fill Random Items</button>
+                    <button class="dev-button" onclick="exportData()">Export Data (JSON)</button>
+                    <button class="dev-button" onclick="importData()">Import Data (JSON)</button>
+                    <button class="dev-button" onclick="toggleDevMode()">Close Dev Mode</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users View -->
+        <div id="usersView" class="view">
+            <div class="container">
+                <h1>Switch User</h1>
+                <div class="subtitle">Select a user or create a new one</div>
+
+                <div id="usersList" style="margin-bottom: 20px;">
+                    <!-- User list will be generated by JavaScript -->
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="create-button" onclick="switchView('creator')">Create New User</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics View -->
+        <div id="statisticsView" class="view">
+            <div class="container" style="max-width: 1400px;">
+                <h1>Statistics - All Bingo Cards</h1>
+                <div class="subtitle">View all users' bingo cards and their progress</div>
+
+                <div id="statisticsGrid" style="margin-top: 30px;">
+                    <!-- Statistics grid will be generated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Creator View -->
+        <div id="creatorView" class="view">
+            <div class="container">
+                <h1>Create Your Bingo Bucket List</h1>
+                <div class="subtitle">Fill in your name and 24 bucket list items to create your personalized bingo card</div>
+
+                <form id="bingoForm">
+                    <div class="form-section">
+                        <label for="userName">Name</label>
+                        <input type="text" id="userName" name="userName" placeholder="Enter your name" required>
+                    </div>
+
+                    <div class="form-section">
+                        <label>Your 24 Bucket List Items</label>
+                        <div class="items-grid" id="itemsGrid">
+                            <!-- Items will be generated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <button type="submit" class="create-button">Create My Bingo Card</button>
+
+                    <div class="helper-text">
+                        The center space will automatically be a FREE SPACE
+                    </div>
+                </form>
+
+                <!-- Dev Mode Panel (hidden by default) -->
+                <div id="devPanelCreator" class="dev-panel no-print">
+                    <h3>Developer Mode</h3>
+                    <button class="dev-button" onclick="visualRandomizeCard()">Visual Randomizer</button>
+                    <button class="dev-button" onclick="randomizeCard()">Instant Randomize</button>
+                    <button class="dev-button" onclick="fillAllItems()">Fill Random Items</button>
+                    <button class="dev-button" onclick="exportData()">Export Data (JSON)</button>
+                    <button class="dev-button" onclick="importData()">Import Data (JSON)</button>
+                    <button class="dev-button" onclick="fillFormWithSamples()">Fill Form with Samples</button>
+                    <button class="dev-button" onclick="toggleDevMode()">Close Dev Mode</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE = window.location.origin;
+
+        let freeSpaceClicks = 0;
+        let devModeActive = false;
+        let currentUserId = null;
+        let allUsers = [];
+
+        // API Helper Functions
+        async function apiRequest(endpoint, options = {}) {
+            const url = `${API_BASE}/api${endpoint}`;
+            const response = await fetch(url, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                }
+            });
+
+            if (!response.ok && response.status !== 404) {
+                throw new Error(`API Error: ${response.statusText}`);
+            }
+
+            if (response.status === 204) {
+                return null;
+            }
+
+            return response.json();
+        }
+
+        // Get all users from API
+        async function getAllUsers() {
+            try {
+                allUsers = await apiRequest('/users');
+                return allUsers;
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                return [];
+            }
+        }
+
+        // Get current user ID
+        function getCurrentUserId() {
+            return currentUserId;
+        }
+
+        // Set current user
+        function setCurrentUser(userId) {
+            currentUserId = userId;
+            localStorage.setItem('currentUserId', userId);
+        }
+
+        // Create new user via API
+        async function createUser(userName, bingoData) {
+            try {
+                const response = await apiRequest('/users', {
+                    method: 'POST',
+                    body: JSON.stringify(bingoData)
+                });
+
+                allUsers.push(response.user);
+                return response.user.id;
+            } catch (error) {
+                console.error('Error creating user:', error);
+                alert('Failed to create user. Please try again.');
+                return null;
+            }
+        }
+
+        // Delete user via API
+        async function deleteUser(userId) {
+            try {
+                await apiRequest(`/users/${userId}`, {
+                    method: 'DELETE'
+                });
+
+                allUsers = allUsers.filter(u => u.id !== userId);
+
+                // If deleting current user, switch to another or null
+                if (getCurrentUserId() === userId) {
+                    if (allUsers.length > 0) {
+                        setCurrentUser(allUsers[0].id);
+                    } else {
+                        currentUserId = null;
+                        localStorage.removeItem('currentUserId');
+                    }
+                }
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                alert('Failed to delete user. Please try again.');
+            }
+        }
+
+        // Get current user's bingo data from API
+        async function getCurrentUserData() {
+            const userId = getCurrentUserId();
+            if (!userId) return null;
+
+            try {
+                return await apiRequest(`/users/${userId}/data`);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                return null;
+            }
+        }
+
+        // Get current user's progress from API
+        async function getUserProgress() {
+            const userId = getCurrentUserId();
+            if (!userId) return { markedCells: [], randomized: false };
+
+            try {
+                return await apiRequest(`/users/${userId}/progress`);
+            } catch (error) {
+                console.error('Error fetching progress:', error);
+                return { markedCells: [], randomized: false };
+            }
+        }
+
+        // Update user's bingo data via API
+        async function updateUserData(data) {
+            const userId = getCurrentUserId();
+            if (!userId) return;
+
+            try {
+                await apiRequest(`/users/${userId}/data`, {
+                    method: 'PUT',
+                    body: JSON.stringify(data)
+                });
+            } catch (error) {
+                console.error('Error updating user data:', error);
+            }
+        }
+
+        // Update user's progress via API
+        async function updateUserProgress(progressData) {
+            const userId = getCurrentUserId();
+            if (!userId) return;
+
+            try {
+                await apiRequest(`/users/${userId}/progress`, {
+                    method: 'PUT',
+                    body: JSON.stringify(progressData)
+                });
+            } catch (error) {
+                console.error('Error updating progress:', error);
+            }
+        }
+
+        // Default empty data
+        const defaultData = {
+            userName: "",
+            year: new Date().getFullYear(),
+            items: Array(24).fill("")
+        };
+
+        // Switch between views
+        function switchView(viewName) {
+            // Hide all views
+            document.querySelectorAll('.view').forEach(view => {
+                view.classList.remove('active');
+            });
+
+            // Remove active from all nav buttons
+            document.querySelectorAll('.nav-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected view
+            if (viewName === 'card') {
+                document.getElementById('cardView').classList.add('active');
+                document.querySelectorAll('.nav-button')[1].classList.add('active');
+            } else if (viewName === 'creator') {
+                document.getElementById('creatorView').classList.add('active');
+                document.querySelectorAll('.nav-button')[0].classList.add('active');
+            } else if (viewName === 'users') {
+                document.getElementById('usersView').classList.add('active');
+                document.querySelectorAll('.nav-button')[2].classList.add('active');
+                renderUsersList();
+            } else if (viewName === 'statistics') {
+                document.getElementById('statisticsView').classList.add('active');
+                document.querySelectorAll('.nav-button')[3].classList.add('active');
+                renderStatistics();
+            }
+        }
+
+        // Render users list
+        async function renderUsersList() {
+            const users = await getAllUsers();
+            const usersList = document.getElementById('usersList');
+            const currentId = getCurrentUserId();
+
+            if (users.length === 0) {
+                usersList.innerHTML = '<div class="no-users-message">No users yet. Create your first user to get started!</div>';
+                return;
+            }
+
+            usersList.innerHTML = users.map(user => {
+                const isActive = user.id === currentId;
+                return `
+                    <div class="user-card ${isActive ? 'active' : ''}" onclick="switchToUser('${user.id}')">
+                        <div class="user-info">
+                            <h3>${user.name}${isActive ? ' (Current)' : ''}</h3>
+                            <p>Created: ${new Date(user.createdAt).toLocaleDateString()}</p>
+                        </div>
+                        <div class="user-actions">
+                            <button class="delete-user-btn" onclick="event.stopPropagation(); confirmDeleteUser('${user.id}', '${user.name}')">Delete</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Switch to a different user
+        async function switchToUser(userId) {
+            setCurrentUser(userId);
+            await initializeBingoCard();
+            switchView('card');
+        }
+
+        // Confirm and delete user
+        async function confirmDeleteUser(userId, userName) {
+            if (confirm(`Are you sure you want to delete ${userName}'s bingo card? This cannot be undone.`)) {
+                await deleteUser(userId);
+                await renderUsersList();
+
+                // If no users left, go to creator
+                if (allUsers.length === 0) {
+                    switchView('creator');
+                } else {
+                    await initializeBingoCard();
+                }
+            }
+        }
+
+        // Initialize the bingo card
+        async function initializeBingoCard() {
+            const data = await getCurrentUserData() || defaultData;
+
+            // Update title
+            const titleText = data.userName
+                ? `${data.userName}'s ${data.year} Bingo Bucket List`
+                : `${data.year} Bingo Bucket List`;
+            document.getElementById('cardTitle').textContent = titleText;
+
+            // Generate bingo cells
+            const bingoCard = document.getElementById('bingoCard');
+            bingoCard.innerHTML = '';
+
+            // Create array of items in display order (left to right, top to bottom)
+            // Position 12 (center, 0-indexed) is always FREE SPACE
+            const displayItems = [...data.items];
+
+            for (let i = 0; i < 25; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'bingo-cell';
+
+                // Center cell (position 12) is FREE SPACE
+                if (i === 12) {
+                    cell.classList.add('free-space');
+                    cell.innerHTML = 'FREE SPACE<br>★';
+
+                    // Add secret click handler for dev mode
+                    cell.addEventListener('click', function() {
+                        freeSpaceClicks++;
+                        if (freeSpaceClicks === 5) {
+                            toggleDevMode();
+                            freeSpaceClicks = 0;
+                        }
+                        // Reset counter after 2 seconds
+                        setTimeout(() => {
+                            if (freeSpaceClicks < 5) freeSpaceClicks = 0;
+                        }, 2000);
+                    });
+                } else {
+                    // Get item index, accounting for FREE SPACE at position 12
+                    const itemIndex = i < 12 ? i : i - 1;
+                    cell.textContent = displayItems[itemIndex];
+
+                    // Add click handler
+                    cell.addEventListener('click', async function() {
+                        // Check if card has been randomized first
+                        if (!await hasBeenRandomized()) {
+                            alert('Please randomize your card first before marking items as complete!');
+                            return;
+                        }
+                        this.classList.toggle('marked');
+                        await saveProgress();
+                    });
+                }
+
+                bingoCard.appendChild(cell);
+            }
+
+            // Adjust font sizes for overflow after a delay to ensure rendering and font loading
+            setTimeout(() => adjustCellFontSizes(), 300);
+
+            // Load saved progress
+            await loadProgress();
+
+            // Update randomize button state
+            await updateRandomizeButton();
+
+            // Update cell locked state
+            await updateCellsLockedState();
+        }
+
+        // Adjust font size for cells with overflow
+        function adjustCellFontSizes() {
+            const cells = document.querySelectorAll('.bingo-cell');
+
+            cells.forEach((cell, index) => {
+                // Skip empty cells
+                if (!cell.textContent.trim()) return;
+
+                // Remove any previous inline font-size to use CSS default
+                cell.style.removeProperty('font-size');
+
+                // Wait for layout to settle with triple RAF for maximum stability
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            // Force a reflow to ensure accurate measurements
+                            void cell.offsetHeight;
+
+                            // Get computed font size from CSS
+                            let fontSize = parseFloat(window.getComputedStyle(cell).fontSize);
+                            const minFontSize = 8;
+
+                            const tolerance = 2;
+
+                            // Check if content actually overflows
+                            const heightOverflow = cell.scrollHeight > (cell.clientHeight + tolerance);
+                            const widthOverflow = cell.scrollWidth > (cell.clientWidth + tolerance);
+
+                            // Only proceed if there's ACTUAL overflow beyond tolerance
+                            if (!heightOverflow && !widthOverflow) return;
+
+                            // Now shrink iteratively until it fits
+                            let iterations = 0;
+                            const maxIterations = 50;
+
+                            while (iterations < maxIterations && fontSize > minFontSize) {
+                                const stillOverflowHeight = cell.scrollHeight > (cell.clientHeight + tolerance);
+                                const stillOverflowWidth = cell.scrollWidth > (cell.clientWidth + tolerance);
+
+                                if (!stillOverflowHeight && !stillOverflowWidth) break;
+
+                                // Reduce font size by 1px
+                                fontSize -= 1;
+                                cell.style.setProperty('font-size', fontSize + 'px', 'important');
+
+                                // Force reflow after each change for accurate measurement
+                                void cell.offsetHeight;
+
+                                iterations++;
+                            }
+                        });
+                    });
+                });
+            });
+        }
+
+        // Load saved progress when page loads
+        async function loadProgress() {
+            const userId = getCurrentUserId();
+            if (!userId) return;
+
+            const progress = await getUserProgress();
+            if (progress && progress.markedCells) {
+                document.querySelectorAll('.bingo-cell:not(.free-space)').forEach((cell, index) => {
+                    if (progress.markedCells.includes(index)) {
+                        cell.classList.add('marked');
+                    }
+                });
+            }
+        }
+
+        // Save progress to API
+        async function saveProgress() {
+            const userId = getCurrentUserId();
+            if (!userId) return;
+
+            const markedCells = [];
+            document.querySelectorAll('.bingo-cell:not(.free-space)').forEach((cell, index) => {
+                if (cell.classList.contains('marked')) {
+                    markedCells.push(index);
+                }
+            });
+
+            await updateUserProgress({ markedCells });
+        }
+
+        // Reset all progress
+        async function resetProgress() {
+            const userId = getCurrentUserId();
+            if (!userId) return;
+
+            if (confirm('Are you sure you want to reset all your progress?')) {
+                await apiRequest(`/users/${userId}/reset-progress`, {
+                    method: 'POST'
+                });
+
+                document.querySelectorAll('.bingo-cell.marked').forEach(cell => {
+                    cell.classList.remove('marked');
+                });
+            }
+        }
+
+        // Clear bingo card (remove custom data)
+        async function clearBingoCard() {
+            const userId = getCurrentUserId();
+            if (!userId) return;
+
+            if (confirm('Are you sure you want to delete this bingo card? This will remove your user and all data.')) {
+                const users = await getAllUsers();
+                const user = users.find(u => u.id === userId);
+                if (user) {
+                    await deleteUser(userId);
+                    if (allUsers.length === 0) {
+                        switchView('creator');
+                    } else {
+                        await initializeBingoCard();
+                        switchView('card');
+                    }
+                }
+            }
+        }
+
+        // Update randomize button state based on whether card has been randomized
+        async function updateRandomizeButton() {
+            const randomizeBtn = document.querySelector('.randomize-button');
+            if (!randomizeBtn) return;
+
+            const hasRandomized = await hasBeenRandomized();
+
+            if (hasRandomized) {
+                randomizeBtn.disabled = true;
+                randomizeBtn.textContent = 'Already Randomized';
+                randomizeBtn.style.opacity = '0.5';
+                randomizeBtn.style.cursor = 'not-allowed';
+            } else {
+                randomizeBtn.disabled = false;
+                randomizeBtn.textContent = 'Randomize!';
+                randomizeBtn.style.opacity = '';
+                randomizeBtn.style.cursor = '';
+            }
+        }
+
+        // Check if user has already randomized
+        async function hasBeenRandomized() {
+            const userId = getCurrentUserId();
+            if (!userId) return false;
+
+            const progress = await getUserProgress();
+            return progress.randomized || false;
+        }
+
+        // Mark card as randomized
+        async function markAsRandomized() {
+            const userId = getCurrentUserId();
+            if (!userId) return;
+
+            await apiRequest(`/users/${userId}/randomize`, {
+                method: 'POST'
+            });
+
+            await updateRandomizeButton();
+            await updateCellsLockedState();
+        }
+
+        // Update locked state of cells based on randomization status
+        async function updateCellsLockedState() {
+            const cells = document.querySelectorAll('.bingo-cell:not(.free-space)');
+            const hasRandomized = await hasBeenRandomized();
+
+            cells.forEach(cell => {
+                if (hasRandomized) {
+                    cell.classList.remove('locked');
+                } else {
+                    cell.classList.add('locked');
+                }
+            });
+        }
+
+        // Initialize creator form
+        function initializeCreatorForm() {
+            // Fun placeholder examples
+            const placeholders = [
+                "Visit a new country",
+                "Learn to play an instrument",
+                "Run a 5k race",
+                "Try surfing",
+                "Write in a journal for 30 days",
+                "Learn a new language",
+                "Go on a road trip",
+                "Take a cooking class",
+                "Volunteer at an animal shelter",
+                "Watch the sunrise",
+                "Plant a garden",
+                "Try skydiving",
+                "Read 12 books this year",
+                "Learn to meditate",
+                "Go camping under the stars",
+                "Take a dance class",
+                "Visit a museum",
+                "Try a new cuisine",
+                "Complete a puzzle",
+                "Go hiking in the mountains",
+                "Learn photography",
+                "Attend a live concert",
+                "Start a new hobby",
+                "Make something from scratch"
+            ];
+
+            // Generate 24 input fields
+            const itemsGrid = document.getElementById('itemsGrid');
+            itemsGrid.innerHTML = '';
+
+            for (let i = 1; i <= 24; i++) {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'item-input';
+                itemDiv.innerHTML = `
+                    <label>Item ${i}</label>
+                    <input type="text" id="item${i}" name="item${i}" placeholder="${placeholders[i - 1]}" required>
+                `;
+                itemsGrid.appendChild(itemDiv);
+            }
+
+            // Handle form submission
+            document.getElementById('bingoForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                // Collect form data
+                const userName = document.getElementById('userName').value;
+                const items = [];
+
+                for (let i = 1; i <= 24; i++) {
+                    items.push(document.getElementById(`item${i}`).value);
+                }
+
+                // Create bingo data
+                const bingoData = {
+                    userName: userName,
+                    items: items,
+                    year: new Date().getFullYear()
+                };
+
+                // Create new user via API
+                const userId = await createUser(userName, bingoData);
+                if (userId) {
+                    setCurrentUser(userId);
+
+                    // Reinitialize the bingo card with new data
+                    await initializeBingoCard();
+
+                    // Switch to card view
+                    switchView('card');
+                }
+            });
+        }
+
+        // Toggle dev mode
+        function toggleDevMode() {
+            devModeActive = !devModeActive;
+            const devPanel = document.getElementById('devPanel');
+            const devPanelCreator = document.getElementById('devPanelCreator');
+
+            if (devModeActive) {
+                devPanel.classList.add('active');
+                devPanelCreator.classList.add('active');
+                console.log('Dev Mode Activated! 🛠️');
+            } else {
+                devPanel.classList.remove('active');
+                devPanelCreator.classList.remove('active');
+                console.log('Dev Mode Deactivated');
+            }
+        }
+
+        // Fill form with sample data
+        function fillFormWithSamples() {
+            const placeholders = [
+                "Visit a new country", "Learn to play an instrument", "Run a 5k race",
+                "Try surfing", "Write in a journal for 30 days", "Learn a new language",
+                "Go on a road trip", "Take a cooking class", "Volunteer at an animal shelter",
+                "Watch the sunrise", "Plant a garden", "Try skydiving",
+                "Read 12 books this year", "Learn to meditate", "Go camping under the stars",
+                "Take a dance class", "Visit a museum", "Try a new cuisine",
+                "Complete a puzzle", "Go hiking in the mountains", "Learn photography",
+                "Attend a live concert", "Start a new hobby", "Make something from scratch"
+            ];
+
+            document.getElementById('userName').value = "Demo User";
+            for (let i = 1; i <= 24; i++) {
+                document.getElementById(`item${i}`).value = placeholders[i - 1];
+            }
+            alert('Form filled with sample data! 📝');
+        }
+
+        // Visual randomizer with animations
+        async function visualRandomizeCard() {
+            const userId = getCurrentUserId();
+            if (!userId) {
+                alert('No user selected! Please create a user first.');
+                return;
+            }
+
+            // Check if already randomized (unless in dev mode)
+            if (!devModeActive && await hasBeenRandomized()) {
+                alert('You have already randomized this card once. You cannot randomize it again.');
+                return;
+            }
+
+            const data = await getCurrentUserData();
+            if (!data) {
+                alert('No custom data to randomize! Create a card first.');
+                return;
+            }
+
+            const numSwaps = 40;
+
+            // Disable randomize button during animation
+            const randomizeBtn = document.querySelector('.randomize-button');
+            if (randomizeBtn) randomizeBtn.disabled = true;
+            document.querySelectorAll('.dev-button').forEach(btn => btn.disabled = true);
+
+            for (let swap = 0; swap < numSwaps; swap++) {
+                // Calculate speed multiplier - gradually speeds up from 1x to 5x
+                const speedMultiplier = 1 + (swap / numSwaps) * 4;
+                await performAnimatedSwap(data, speedMultiplier);
+            }
+
+            // Save the final shuffled state via API
+            await updateUserData(data);
+
+            // Clear progress via API
+            await apiRequest(`/users/${userId}/reset-progress`, {
+                method: 'POST'
+            });
+
+            // Mark as randomized (always call API to maintain consistency)
+            await markAsRandomized();
+
+            // Re-enable dev buttons (regular button will be disabled if randomized)
+            document.querySelectorAll('.dev-button').forEach(btn => btn.disabled = false);
+        }
+
+        // Perform a single animated swap
+        async function performAnimatedSwap(data, speedMultiplier = 1) {
+            const cells = Array.from(document.querySelectorAll('.bingo-cell:not(.free-space)'));
+
+            // Pick two random cells (excluding free space)
+            const index1 = Math.floor(Math.random() * 24);
+            const index2 = Math.floor(Math.random() * 24);
+
+            if (index1 === index2) return performAnimatedSwap(data, speedMultiplier);
+
+            const cell1 = cells[index1];
+            const cell2 = cells[index2];
+
+            // Store original content
+            const content1 = cell1.textContent;
+            const content2 = cell2.textContent;
+
+            // Highlight the cells
+            cell1.classList.add('highlight');
+            cell2.classList.add('highlight');
+
+            await sleep(300 / speedMultiplier);
+
+            // Remove highlighting
+            cell1.classList.remove('highlight');
+            cell2.classList.remove('highlight');
+
+            // Get positions for animation
+            const rect1 = cell1.getBoundingClientRect();
+            const rect2 = cell2.getBoundingClientRect();
+
+            // Calculate the distance to move
+            const deltaX = rect2.left - rect1.left;
+            const deltaY = rect2.top - rect1.top;
+
+            // Add swapping class for animation with dynamic duration
+            cell1.classList.add('swapping');
+            cell2.classList.add('swapping');
+
+            // Set transition duration dynamically
+            const swapDuration = 500 / speedMultiplier;
+            cell1.style.transition = `all ${swapDuration}ms cubic-bezier(0.68, -0.55, 0.265, 1.55)`;
+            cell2.style.transition = `all ${swapDuration}ms cubic-bezier(0.68, -0.55, 0.265, 1.55)`;
+
+            // Perform the visual swap
+            cell1.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+            cell2.style.transform = `translate(${-deltaX}px, ${-deltaY}px)`;
+
+            await sleep(swapDuration);
+
+            // Swap the actual data
+            [data.items[index1], data.items[index2]] = [data.items[index2], data.items[index1]];
+
+            // Disable transitions to prevent snap-back animation
+            cell1.style.transition = 'none';
+            cell2.style.transition = 'none';
+
+            // Swap the text content
+            cell1.textContent = content2;
+            cell2.textContent = content1;
+
+            // Remove transforms instantly
+            cell1.style.transform = '';
+            cell2.style.transform = '';
+
+            // Clean up classes and styles
+            cell1.classList.remove('swapping');
+            cell2.classList.remove('swapping');
+
+            // Force a reflow
+            void cell1.offsetHeight;
+            void cell2.offsetHeight;
+
+            // Re-enable transitions for next animation
+            cell1.style.transition = '';
+            cell2.style.transition = '';
+
+            await sleep(100 / speedMultiplier);
+        }
+
+        // Helper function for delays
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Instant randomize (no animation)
+        async function randomizeCard() {
+            const userId = getCurrentUserId();
+            if (!userId) {
+                alert('No user selected!');
+                return;
+            }
+
+            const data = await getCurrentUserData();
+            if (!data) {
+                alert('No custom data to randomize! Create a card first.');
+                return;
+            }
+
+            // Shuffle the items array
+            for (let i = data.items.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [data.items[i], data.items[j]] = [data.items[j], data.items[i]];
+            }
+
+            await updateUserData(data);
+            await apiRequest(`/users/${userId}/reset-progress`, {
+                method: 'POST'
+            });
+            await initializeBingoCard();
+            alert('Card randomized instantly! 🎲');
+        }
+
+        // Fill card with random sample items
+        async function fillAllItems() {
+            const sampleItems = [
+                "Visit a new country", "Learn to play an instrument", "Run a 5k race",
+                "Try surfing", "Write in a journal for 30 days", "Learn a new language",
+                "Go on a road trip", "Take a cooking class", "Volunteer at an animal shelter",
+                "Watch the sunrise", "Plant a garden", "Try skydiving",
+                "Read 12 books this year", "Learn to meditate", "Go camping under the stars",
+                "Take a dance class", "Visit a museum", "Try a new cuisine",
+                "Complete a puzzle", "Go hiking in the mountains", "Learn photography",
+                "Attend a live concert", "Start a new hobby", "Make something from scratch"
+            ];
+
+            const bingoData = {
+                userName: "Demo User",
+                items: sampleItems,
+                year: new Date().getFullYear()
+            };
+
+            const userId = await createUser("Demo User", bingoData);
+            if (userId) {
+                setCurrentUser(userId);
+                await initializeBingoCard();
+                alert('Card filled with sample items! 📝');
+            }
+        }
+
+        // Export data as JSON
+        async function exportData() {
+            const userId = getCurrentUserId();
+            if (!userId) {
+                alert('No user selected!');
+                return;
+            }
+
+            const user = allUsers.find(u => u.id === userId);
+            const data = await getCurrentUserData();
+            const progress = await getUserProgress();
+
+            const exportObj = {
+                user: user,
+                bingoData: data,
+                progress: progress.markedCells || [],
+                randomized: progress.randomized || false
+            };
+
+            const dataStr = JSON.stringify(exportObj, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `bingo-${user.name}-data.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+            console.log('Data exported:', exportObj);
+        }
+
+        // Import data from JSON
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'application/json';
+            input.onchange = async function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = async function(event) {
+                    try {
+                        const importObj = JSON.parse(event.target.result);
+                        if (importObj.bingoData && importObj.user) {
+                            // Create new user from imported data
+                            const userId = await createUser(importObj.user.name, importObj.bingoData);
+
+                            if (userId) {
+                                // Import progress
+                                if (importObj.progress) {
+                                    await updateUserProgress({
+                                        markedCells: importObj.progress,
+                                        randomized: importObj.randomized || false
+                                    });
+                                }
+
+                                setCurrentUser(userId);
+                                await initializeBingoCard();
+                                alert('Data imported successfully! 📥');
+                            }
+                        }
+                    } catch (error) {
+                        alert('Error importing data: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        // Render statistics view with all users' bingo cards
+        async function renderStatistics() {
+            const statisticsGrid = document.getElementById('statisticsGrid');
+            statisticsGrid.innerHTML = '<div class="loading-message">Loading statistics...</div>';
+
+            try {
+                const users = await getAllUsers();
+
+                if (users.length === 0) {
+                    statisticsGrid.innerHTML = '<div class="no-users-message">No users yet. Create your first user to get started!</div>';
+                    return;
+                }
+
+                // Create grid container
+                const gridDiv = document.createElement('div');
+                gridDiv.className = 'statistics-grid';
+
+                // Fetch all user data in parallel
+                const userDataPromises = users.map(async (user) => {
+                    const bingoData = await apiRequest(`/users/${user.id}/data`);
+                    const progress = await apiRequest(`/users/${user.id}/progress`);
+                    return { user, bingoData, progress };
+                });
+
+                const allUserData = await Promise.all(userDataPromises);
+
+                // Create a card for each user
+                allUserData.forEach(({ user, bingoData, progress }) => {
+                    const cardContainer = document.createElement('div');
+                    cardContainer.className = 'user-bingo-card-container';
+
+                    // User name
+                    const nameHeader = document.createElement('h3');
+                    nameHeader.textContent = user.name;
+                    cardContainer.appendChild(nameHeader);
+
+                    // Mini bingo card
+                    const miniCard = document.createElement('div');
+                    miniCard.className = 'mini-bingo-card';
+
+                    // Get marked cells from progress
+                    const markedCells = progress.markedCells || [];
+
+                    // Create 25 cells (including free space)
+                    let nonFreeSpaceIndex = 0; // Track index for non-free-space cells (0-23)
+                    for (let i = 0; i < 25; i++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'mini-bingo-cell';
+
+                        // Center cell (position 12) is FREE SPACE
+                        if (i === 12) {
+                            cell.classList.add('mini-free-space');
+                            cell.innerHTML = 'FREE<br>★';
+                        } else {
+                            // Get item index, accounting for FREE SPACE at position 12
+                            const itemIndex = i < 12 ? i : i - 1;
+                            cell.textContent = bingoData.items[itemIndex] || '';
+
+                            // Check if this cell is marked using the non-free-space index
+                            if (markedCells.includes(nonFreeSpaceIndex)) {
+                                cell.classList.add('marked');
+                            }
+                            nonFreeSpaceIndex++; // Increment only for non-free-space cells
+                        }
+
+                        miniCard.appendChild(cell);
+                    }
+
+                    cardContainer.appendChild(miniCard);
+                    gridDiv.appendChild(cardContainer);
+                });
+
+                statisticsGrid.innerHTML = '';
+                statisticsGrid.appendChild(gridDiv);
+
+            } catch (error) {
+                console.error('Error rendering statistics:', error);
+                statisticsGrid.innerHTML = '<div class="no-users-message">Error loading statistics. Please try again.</div>';
+            }
+        }
+
+        // Initialize everything on page load
+        window.addEventListener('DOMContentLoaded', async function() {
+            initializeCreatorForm();
+
+            // Check for saved current user ID
+            const savedUserId = localStorage.getItem('currentUserId');
+            if (savedUserId) {
+                currentUserId = savedUserId;
+            }
+
+            // Check if there are any users via API
+            const users = await getAllUsers();
+            if (users.length === 0) {
+                // No users, go to creator
+                switchView('creator');
+            } else {
+                // Has users, check if current user is set
+                if (!getCurrentUserId() || !users.find(u => u.id === getCurrentUserId())) {
+                    // No current user or current user doesn't exist, set to first user
+                    setCurrentUser(users[0].id);
+                }
+                await initializeBingoCard();
+                switchView('users');
+            }
+        });
+    </script>
+</body>
+</html>
