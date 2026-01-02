@@ -2,6 +2,19 @@
 
 A family-friendly bucket list bingo application with Flask backend for multi-device sync!
 
+## Features
+
+- 🎯 **Create Custom Bingo Cards** - Add 24 personalized bucket list items
+- 🎲 **Visual Randomizer** - Fun animated randomization of your bingo card
+- 👥 **Multi-User Support** - Create and manage multiple users/family members
+- 📊 **Statistics & Leaderboards** - Track progress with:
+  - Items completed leaderboard
+  - Bingos achieved leaderboard
+  - Visual overview of all users' cards
+- 💾 **Automatic Sync** - Access your cards from any device on your network
+- 🏆 **Bingo Detection** - Automatically counts rows, columns, and diagonals
+- 🖨️ **Print Support** - Print your bingo cards
+
 ## What's New?
 
 This version replaces localStorage with a Flask backend and SQLite database, enabling:
@@ -9,6 +22,7 @@ This version replaces localStorage with a Flask backend and SQLite database, ena
 - ✅ Automatic sync across all devices
 - ✅ Centralized family data storage
 - ✅ No more losing data when clearing browser cache
+- ✅ Real-time statistics and leaderboards
 
 ## Quick Start
 
@@ -78,6 +92,17 @@ To make this accessible from anywhere (not just your local network), you can dep
 - **Render** (Free tier available): https://render.com/
 - **Heroku** (Paid): https://www.heroku.com/
 - **Your own server** with a static IP
+
+## How to Use
+
+1. **Create a User** - Click "Create New Card" and fill in your name and 24 bucket list items
+2. **Randomize** - Click the "Randomize!" button to shuffle your card (one-time only)
+3. **Mark Progress** - Click on cells as you complete items
+4. **View Statistics** - Check the "Leaderboard" tab to see:
+   - Rankings by items completed
+   - Rankings by bingos achieved
+   - Visual overview of all users' progress
+5. **Switch Users** - Use the "Switch User" tab to view or manage different family members
 
 ## Project Structure
 
