@@ -1872,8 +1872,11 @@
 
         // Render a leaderboard
         function renderLeaderboard(container, userStats, sortKey, formatScore) {
+            // Filter out users with 0 points in this category
+            const filteredUsers = userStats.filter(user => user[sortKey] > 0);
+
             // Sort users by the given key in descending order
-            const sortedUsers = [...userStats].sort((a, b) => b[sortKey] - a[sortKey]);
+            const sortedUsers = [...filteredUsers].sort((a, b) => b[sortKey] - a[sortKey]);
 
             container.innerHTML = '';
 
