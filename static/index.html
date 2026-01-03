@@ -103,12 +103,13 @@
             justify-content: center;
             text-align: center;
             padding: 4px;
-            font-size: 1.0em !important;
+            /* Responsive font sizing using clamp() - scales with container width */
+            font-size: clamp(0.45rem, 2.5vw, 0.85rem) !important;
             background: white;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
-            line-height: 1.2;
+            line-height: 1.1;
             font-weight: bold;
             text-transform: uppercase;
             overflow: hidden;
@@ -144,7 +145,7 @@
             background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
             color: white;
             font-weight: bold;
-            font-size: 0.8em;
+            font-size: clamp(0.5rem, 2.2vw, 0.9rem) !important;
             cursor: default;
         }
 
@@ -227,7 +228,6 @@
                 border: 3px solid #667eea;
                 border-radius: 10px;
                 padding: 10px;
-                font-size: 0.85em;
             }
 
             .bingo-cell:hover {
@@ -237,10 +237,6 @@
 
             .bingo-cell.marked::after {
                 font-size: 3em;
-            }
-
-            .free-space {
-                font-size: 1.2em;
             }
 
             .free-space:hover {
@@ -1236,9 +1232,6 @@
                 bingoCard.appendChild(cell);
             }
 
-            // Adjust font sizes for overflow after a delay to ensure rendering and font loading
-            setTimeout(() => adjustCellFontSizes(), 300);
-
             // Load saved progress
             await loadProgress();
 
@@ -1247,62 +1240,6 @@
 
             // Update cell locked state
             await updateCellsLockedState();
-        }
-
-        // Adjust font size for cells with overflow
-        function adjustCellFontSizes() {
-            const cells = document.querySelectorAll('.bingo-cell');
-
-            cells.forEach((cell, index) => {
-                // Skip empty cells
-                if (!cell.textContent.trim()) return;
-
-                // Remove any previous inline font-size to use CSS default
-                cell.style.removeProperty('font-size');
-
-                // Wait for layout to settle with triple RAF for maximum stability
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        requestAnimationFrame(() => {
-                            // Force a reflow to ensure accurate measurements
-                            void cell.offsetHeight;
-
-                            // Get computed font size from CSS
-                            let fontSize = parseFloat(window.getComputedStyle(cell).fontSize);
-                            const minFontSize = 8;
-
-                            const tolerance = 2;
-
-                            // Check if content actually overflows
-                            const heightOverflow = cell.scrollHeight > (cell.clientHeight + tolerance);
-                            const widthOverflow = cell.scrollWidth > (cell.clientWidth + tolerance);
-
-                            // Only proceed if there's ACTUAL overflow beyond tolerance
-                            if (!heightOverflow && !widthOverflow) return;
-
-                            // Now shrink iteratively until it fits
-                            let iterations = 0;
-                            const maxIterations = 50;
-
-                            while (iterations < maxIterations && fontSize > minFontSize) {
-                                const stillOverflowHeight = cell.scrollHeight > (cell.clientHeight + tolerance);
-                                const stillOverflowWidth = cell.scrollWidth > (cell.clientWidth + tolerance);
-
-                                if (!stillOverflowHeight && !stillOverflowWidth) break;
-
-                                // Reduce font size by 1px
-                                fontSize -= 1;
-                                cell.style.setProperty('font-size', fontSize + 'px', 'important');
-
-                                // Force reflow after each change for accurate measurement
-                                void cell.offsetHeight;
-
-                                iterations++;
-                            }
-                        });
-                    });
-                });
-            });
         }
 
         // Load saved progress when page loads
