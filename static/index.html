@@ -22,6 +22,24 @@
             padding: 0;
         }
 
+        .page-header {
+            text-align: center;
+            padding: 20px 20px 10px 20px;
+            display: none;
+        }
+
+        .page-header.visible {
+            display: block;
+        }
+
+        .page-header h1 {
+            color: white;
+            margin: 0;
+            font-size: clamp(1.8em, 5vw, 2.5em);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            font-weight: bold;
+        }
+
         .navbar {
             background: rgba(0, 0, 0, 0.2);
             padding: 15px;
@@ -45,11 +63,28 @@
 
         .nav-button:hover {
             background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
         }
 
         .nav-button.active {
-            background: white;
-            color: #667eea;
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 10px rgba(118, 75, 162, 0.4);
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        .nav-button.active:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        /* Hide conditional nav buttons by default to prevent flash on load */
+        #navCreator,
+        #navCreatorMobile,
+        #navCard,
+        #navCardMobile {
+            display: none;
         }
 
         .main-content {
@@ -1016,7 +1051,7 @@
             top: 15px;
             left: 15px;
             z-index: 1000;
-            background: rgba(255, 255, 255, 0.3);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
             border: 2px solid white;
             border-radius: 8px;
             padding: 12px;
@@ -1030,11 +1065,17 @@
             align-items: center;
             justify-content: center;
             backdrop-filter: blur(10px);
-            transition: background 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        .hamburger-menu:hover {
+            transform: scale(1.05);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
         }
 
         .hamburger-menu:active {
-            background: rgba(255, 255, 255, 0.5);
+            transform: scale(0.95);
         }
 
         /* Sidebar */
@@ -1063,6 +1104,12 @@
             text-align: left;
             padding: 15px 20px;
             font-size: 1em;
+        }
+
+        .sidebar .nav-button.active {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), 0 0 8px rgba(118, 75, 162, 0.3);
+            transform: scale(1.01);
         }
 
         /* Backdrop Overlay */
@@ -1107,7 +1154,7 @@
             }
         }
 
-        /* Statistics view styles */
+        /* Overview view styles */
         .statistics-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -1335,6 +1382,11 @@
     </style>
 </head>
 <body>
+    <!-- Page Header -->
+    <div class="page-header no-print" id="pageHeader">
+        <h1>Bucket List Bingo!</h1>
+    </div>
+
     <!-- Hamburger Menu Button (Mobile Only) -->
     <button class="hamburger-menu no-print" onclick="toggleSidebar()">
         <span class="hamburger-icon">☰</span>
@@ -1342,20 +1394,20 @@
 
     <!-- Sidebar -->
     <div class="sidebar no-print" id="sidebar">
-        <button class="nav-button" onclick="switchView('creator'); closeSidebar();">Create New Card</button>
-        <button class="nav-button" onclick="switchView('card'); closeSidebar();">Bingo Card</button>
         <button class="nav-button" onclick="switchView('users'); closeSidebar();">Switch User</button>
-        <button class="nav-button" onclick="switchView('statistics'); closeSidebar();">Statistics</button>
+        <button class="nav-button" id="navCardMobile" onclick="switchView('card'); closeSidebar();">My Bingo Card</button>
+        <button class="nav-button" onclick="switchView('statistics'); closeSidebar();">Overview</button>
+        <button class="nav-button" id="navCreatorMobile" onclick="switchView('creator'); closeSidebar();">Create New Card</button>
     </div>
 
     <!-- Backdrop -->
     <div class="sidebar-backdrop no-print" id="sidebarBackdrop" onclick="closeSidebar()"></div>
 
     <div class="navbar no-print">
-        <button class="nav-button" onclick="switchView('creator')">Create New Card</button>
-        <button class="nav-button" onclick="switchView('card')">Bingo Card</button>
         <button class="nav-button" onclick="switchView('users')">Switch User</button>
-        <button class="nav-button" onclick="switchView('statistics')">Statistics</button>
+        <button class="nav-button" id="navCard" onclick="switchView('card')">My Bingo Card</button>
+        <button class="nav-button" onclick="switchView('statistics')">Overview</button>
+        <button class="nav-button" id="navCreator" onclick="switchView('creator')">Create New Card</button>
     </div>
 
     <div class="main-content">
@@ -1412,7 +1464,7 @@
             </div>
         </div>
 
-        <!-- Statistics View -->
+        <!-- Overview View -->
         <div id="statisticsView" class="view">
             <div class="container" style="max-width: 1400px;">
                 <!-- Leaderboard Section Title -->
@@ -1545,6 +1597,7 @@
         function setCurrentUser(userId) {
             currentUserId = userId;
             localStorage.setItem('currentUserId', userId);
+            updateNavigation();
         }
 
         // Create new user via API
@@ -1669,6 +1722,27 @@
             backdrop.classList.remove('visible');
         }
 
+        // Update navigation visibility based on current state
+        function updateNavigation() {
+            const hasUser = !!getCurrentUserId();
+            const currentView = document.querySelector('.view.active')?.id;
+            const isCreatorView = currentView === 'creatorView';
+
+            // Get all navigation buttons (both mobile and desktop)
+            const navCreator = document.getElementById('navCreator');
+            const navCreatorMobile = document.getElementById('navCreatorMobile');
+            const navCard = document.getElementById('navCard');
+            const navCardMobile = document.getElementById('navCardMobile');
+
+            // "Create New Card" only visible in creator view
+            if (navCreator) navCreator.style.display = isCreatorView ? 'inline-block' : 'none';
+            if (navCreatorMobile) navCreatorMobile.style.display = isCreatorView ? 'block' : 'none';
+
+            // "My Bingo Card" only visible if user is selected
+            if (navCard) navCard.style.display = hasUser ? 'inline-block' : 'none';
+            if (navCardMobile) navCardMobile.style.display = hasUser ? 'block' : 'none';
+        }
+
         // Switch between views
         function switchView(viewName) {
             // Hide all views
@@ -1681,22 +1755,45 @@
                 btn.classList.remove('active');
             });
 
-            // Show selected view
+            // Show selected view and activate corresponding buttons
             if (viewName === 'card') {
                 document.getElementById('cardView').classList.add('active');
-                document.querySelectorAll('.nav-button')[1].classList.add('active');
+                // Activate card buttons (both mobile and desktop)
+                document.querySelectorAll('.nav-button').forEach(btn => {
+                    if (btn.onclick && btn.onclick.toString().includes("switchView('card')")) {
+                        btn.classList.add('active');
+                    }
+                });
             } else if (viewName === 'creator') {
                 document.getElementById('creatorView').classList.add('active');
-                document.querySelectorAll('.nav-button')[0].classList.add('active');
+                // Activate creator buttons (both mobile and desktop)
+                document.querySelectorAll('.nav-button').forEach(btn => {
+                    if (btn.onclick && btn.onclick.toString().includes("switchView('creator')")) {
+                        btn.classList.add('active');
+                    }
+                });
             } else if (viewName === 'users') {
                 document.getElementById('usersView').classList.add('active');
-                document.querySelectorAll('.nav-button')[2].classList.add('active');
+                // Activate users buttons (both mobile and desktop)
+                document.querySelectorAll('.nav-button').forEach(btn => {
+                    if (btn.onclick && btn.onclick.toString().includes("switchView('users')")) {
+                        btn.classList.add('active');
+                    }
+                });
                 renderUsersList();
             } else if (viewName === 'statistics') {
                 document.getElementById('statisticsView').classList.add('active');
-                document.querySelectorAll('.nav-button')[3].classList.add('active');
+                // Activate overview buttons (both mobile and desktop)
+                document.querySelectorAll('.nav-button').forEach(btn => {
+                    if (btn.onclick && btn.onclick.toString().includes("switchView('statistics')")) {
+                        btn.classList.add('active');
+                    }
+                });
                 renderStatistics();
             }
+
+            // Update navigation visibility
+            updateNavigation();
         }
 
         // Render users list
@@ -2415,13 +2512,13 @@
             return bingoCount;
         }
 
-        // Render statistics view with all users' bingo cards
+        // Render overview view with all users' bingo cards
         async function renderStatistics() {
             const statisticsGrid = document.getElementById('statisticsGrid');
             const itemsLeaderboard = document.getElementById('itemsLeaderboard');
             const bingosLeaderboard = document.getElementById('bingosLeaderboard');
 
-            statisticsGrid.innerHTML = '<div class="loading-message">Loading statistics...</div>';
+            statisticsGrid.innerHTML = '<div class="loading-message">Loading overview...</div>';
             itemsLeaderboard.innerHTML = '<div class="loading-message">Loading...</div>';
             bingosLeaderboard.innerHTML = '<div class="loading-message">Loading...</div>';
 
@@ -2554,8 +2651,8 @@
                 statisticsGrid.appendChild(gridDiv);
 
             } catch (error) {
-                console.error('Error rendering statistics:', error);
-                statisticsGrid.innerHTML = '<div class="no-users-message">Error loading statistics. Please try again.</div>';
+                console.error('Error rendering overview:', error);
+                statisticsGrid.innerHTML = '<div class="no-users-message">Error loading overview. Please try again.</div>';
             }
         }
 
@@ -2974,25 +3071,28 @@
         window.addEventListener('DOMContentLoaded', async function() {
             initializeCreatorForm();
 
-            // Check for saved current user ID
-            const savedUserId = localStorage.getItem('currentUserId');
-            if (savedUserId) {
-                currentUserId = savedUserId;
-            }
-
             // Check if there are any users via API
             const users = await getAllUsers();
             if (users.length === 0) {
                 // No users, go to creator
                 switchView('creator');
             } else {
-                // Has users, check if current user is set
-                if (!getCurrentUserId() || !users.find(u => u.id === getCurrentUserId())) {
-                    // No current user or current user doesn't exist, set to first user
-                    setCurrentUser(users[0].id);
+                // Has users, check for saved current user ID
+                const savedUserId = localStorage.getItem('currentUserId');
+
+                // Only set current user if saved ID exists AND is valid
+                if (savedUserId && users.find(u => u.id === savedUserId)) {
+                    currentUserId = savedUserId;
+                    // Valid user is selected, load their card and go to card view
+                    await initializeBingoCard();
+                    switchView('card');
+                } else {
+                    // Clear any invalid saved user
+                    currentUserId = null;
+                    localStorage.removeItem('currentUserId');
+                    // No user selected, go to users view to let them select
+                    switchView('users');
                 }
-                await initializeBingoCard();
-                switchView('users');
             }
         });
     </script>

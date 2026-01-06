@@ -51,3 +51,4 @@ logs/
 
 # Claude
 .claude/
+suggestions.md
