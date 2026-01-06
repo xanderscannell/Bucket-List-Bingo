@@ -2831,56 +2831,66 @@
             const date = document.getElementById('completionDate').value;
             const notes = document.getElementById('completionNotes').value;
 
-            // Save details to API
-            await apiRequest(`/users/${userId}/cell/${currentModalCellIndex}/details`, {
-                method: 'PUT',
-                body: JSON.stringify({
-                    photos: uploadedPhotos,
-                    date: date,
-                    notes: notes
-                })
-            });
+            try {
+                // Save details to API
+                await apiRequest(`/users/${userId}/cell/${currentModalCellIndex}/details`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        photos: uploadedPhotos,
+                        date: date,
+                        notes: notes
+                    })
+                });
 
-            // Mark cell as complete
-            currentModalCellElement.classList.add('marked');
+                // Mark cell as complete
+                currentModalCellElement.classList.add('marked');
 
-            // Add indicator if photos were uploaded
-            if (uploadedPhotos.length > 0) {
-                currentModalCellElement.classList.add('cell-has-details');
+                // Add indicator if photos were uploaded
+                if (uploadedPhotos.length > 0) {
+                    currentModalCellElement.classList.add('cell-has-details');
+                }
+
+                await saveProgress();
+                closeCompletionModal();
+            } catch (error) {
+                console.error('Error saving completion details:', error);
+                alert('Failed to save details. Please try again. Error: ' + error.message);
             }
-
-            await saveProgress();
-            closeCompletionModal();
         }
 
         // Unmark cell and delete details
         async function unmarkCell() {
             if (!currentModalCellElement || currentModalCellIndex === null) return;
 
-            // Check if there are actually photos or notes
-            const userId = getCurrentUserId();
-            const details = await apiRequest(`/users/${userId}/cell/${currentModalCellIndex}/details`);
+            try {
+                // Check if there are actually photos or notes
+                const userId = getCurrentUserId();
+                const details = await apiRequest(`/users/${userId}/cell/${currentModalCellIndex}/details`);
 
-            const hasDetails = details && ((details.photos && details.photos.length > 0) || (details.notes && details.notes.trim()));
+                const hasDetails = details && ((details.photos && details.photos.length > 0) || (details.notes && details.notes.trim()));
 
-            // Only show confirmation if there are photos or notes to delete
-            if (hasDetails) {
-                if (!confirm('Are you sure you want to unmark this item? This will delete all photos and notes.')) {
-                    return;
+                // Only show confirmation if there are photos or notes to delete
+                if (hasDetails) {
+                    if (!confirm('Are you sure you want to unmark this item? This will delete all photos and notes.')) {
+                        return;
+                    }
                 }
+
+                // Delete cell details from API
+                await apiRequest(`/users/${userId}/cell/${currentModalCellIndex}/details`, {
+                    method: 'DELETE'
+                });
+
+                // Unmark cell
+                currentModalCellElement.classList.remove('marked');
+                currentModalCellElement.classList.remove('cell-has-details');
+
+                await saveProgress();
+                closeCompletionModal();
+            } catch (error) {
+                console.error('Error unmarking cell:', error);
+                alert('Failed to unmark item. Please try again. Error: ' + error.message);
             }
-
-            // Delete cell details from API
-            await apiRequest(`/users/${userId}/cell/${currentModalCellIndex}/details`, {
-                method: 'DELETE'
-            });
-
-            // Unmark cell
-            currentModalCellElement.classList.remove('marked');
-            currentModalCellElement.classList.remove('cell-has-details');
-
-            await saveProgress();
-            closeCompletionModal();
         }
 
         // Load cell details indicators

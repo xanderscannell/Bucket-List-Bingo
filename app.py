@@ -5,6 +5,8 @@ from config import Config
 import json
 import os
 import base64
+import sqlite3
+import sys
 from datetime import datetime, timezone
 
 app = Flask(__name__, static_folder='static')
@@ -14,9 +16,50 @@ CORS(app)
 # Initialize database
 db.init_app(app)
 
-# Create tables
+def validate_database_schema():
+    """
+    Validate that the database schema is up to date.
+    Prevents app from starting with an outdated schema.
+    """
+    db_path = os.path.join('instance', 'bingo.db')
+
+    # If database doesn't exist yet, it will be created with correct schema
+    if not os.path.exists(db_path):
+        print("No existing database found - will create with current schema")
+        return True
+
+    # Check if progress table has cell_details column
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    cursor.execute("PRAGMA table_info(progress)")
+    columns = [row[1] for row in cursor.fetchall()]
+
+    conn.close()
+
+    if 'cell_details' not in columns:
+        print("\n" + "="*70)
+        print("ERROR: Database schema is outdated!")
+        print("="*70)
+        print("\nThe 'progress' table is missing the 'cell_details' column.")
+        print("\nTo fix this, run one of the following migration scripts:")
+        print("  1. python migrate_add_cell_details.py")
+        print("  2. python migrate_legacy_database.py")
+        print("\nThe application will not start until the database is migrated.")
+        print("="*70 + "\n")
+        return False
+
+    return True
+
+# Validate schema before creating tables
 with app.app_context():
+    if not validate_database_schema():
+        print("Application startup aborted due to schema validation failure.")
+        sys.exit(1)
+
+    # Create tables (only creates missing tables, doesn't alter existing ones)
     db.create_all()
+    print("✓ Database schema validated successfully")
 
 # Serve the frontend
 @app.route('/')
