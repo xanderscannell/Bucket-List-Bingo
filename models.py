@@ -53,12 +53,14 @@ class Progress(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.String(50), db.ForeignKey('users.id'), nullable=False, unique=True)
     marked_cells = db.Column(db.Text, nullable=True)  # JSON array of indices
+    cell_details = db.Column(db.Text, nullable=True)  # JSON object with details per cell index
     randomized = db.Column(db.Boolean, nullable=False, default=False)
     updated_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     def to_dict(self):
         return {
             'markedCells': json.loads(self.marked_cells) if self.marked_cells else [],
+            'cellDetails': json.loads(self.cell_details) if self.cell_details else {},
             'randomized': self.randomized,
             'updatedAt': self.updated_at.isoformat()
         }
@@ -68,5 +70,6 @@ class Progress(db.Model):
         return Progress(
             user_id=user_id,
             marked_cells=json.dumps(data.get('markedCells', [])),
+            cell_details=json.dumps(data.get('cellDetails', {})),
             randomized=data.get('randomized', False)
         )

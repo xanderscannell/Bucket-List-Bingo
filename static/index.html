@@ -487,6 +487,430 @@
             background: #764ba2;
         }
 
+        /* Modal styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #667eea;
+            font-size: 1.5em;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 2em;
+            color: #999;
+            cursor: pointer;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .modal-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .modal-field label {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 0.95em;
+        }
+
+        .modal-field input[type="date"],
+        .modal-field textarea {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .modal-field input[type="date"]:focus,
+        .modal-field textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal-field textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .photo-upload-area {
+            border: 2px dashed #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .photo-upload-area:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .photo-upload-area input {
+            display: none;
+        }
+
+        .photo-upload-label {
+            color: #667eea;
+            font-weight: bold;
+            display: block;
+            cursor: pointer;
+        }
+
+        .photo-upload-hint {
+            color: #999;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+
+        .photo-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .photo-preview-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #e0e0e0;
+        }
+
+        .photo-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-preview-remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .photo-preview-remove:hover {
+            background: rgba(255, 0, 0, 1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-button-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .modal-button-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .modal-button-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .modal-button-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .modal-button-quick {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .modal-button-quick:hover {
+            background: #f8f9ff;
+        }
+
+        .cell-has-details {
+            position: relative;
+        }
+
+        .cell-has-details::before {
+            content: '📷';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+
+        /* Photo Fullscreen Viewer */
+        .photo-fullscreen-viewer {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 5000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            cursor: pointer;
+        }
+
+        .photo-fullscreen-viewer.active {
+            display: flex;
+        }
+
+        .photo-fullscreen-viewer img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Fullscreen User Card Modal */
+        .fullscreen-card-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .fullscreen-card-modal.active {
+            display: block;
+        }
+
+        .fullscreen-card-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+        }
+
+        .fullscreen-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .fullscreen-card-header h2 {
+            margin: 0;
+            color: #667eea;
+            font-size: 1.8em;
+        }
+
+        .fullscreen-card-close {
+            background: #f0f0f0;
+            border: none;
+            font-size: 2em;
+            color: #666;
+            cursor: pointer;
+            padding: 0;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .fullscreen-card-close:hover {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .fullscreen-bingo-card {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .fullscreen-bingo-cell {
+            aspect-ratio: 1;
+            border: 3px solid #667eea;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10px;
+            font-size: clamp(0.6rem, 2vw, 0.9rem);
+            background: white;
+            cursor: default;
+            transition: all 0.3s;
+            position: relative;
+            line-height: 1.1;
+            font-weight: bold;
+            text-transform: uppercase;
+            overflow: hidden;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+
+        .fullscreen-bingo-cell.marked {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            cursor: pointer;
+        }
+
+        .fullscreen-bingo-cell.marked:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .fullscreen-bingo-cell.marked::after {
+            content: '✓';
+            position: absolute;
+            font-size: 3em;
+            opacity: 0.3;
+        }
+
+        .fullscreen-bingo-cell.cell-has-details::before {
+            content: '📷';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 1em;
+            opacity: 0.9;
+            z-index: 1;
+        }
+
+        .fullscreen-free-space {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+            font-weight: bold;
+            cursor: default !important;
+        }
+
+        .fullscreen-free-space:hover {
+            transform: none !important;
+        }
+
+        .fullscreen-card-hint {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            margin-top: 15px;
+            font-size: 0.95em;
+        }
+
+        @media (max-width: 600px) {
+            .fullscreen-card-container {
+                padding: 20px;
+            }
+
+            .fullscreen-card-header h2 {
+                font-size: 1.3em;
+            }
+
+            .fullscreen-bingo-card {
+                gap: 5px;
+            }
+
+            .fullscreen-bingo-cell {
+                border: 2px solid #667eea;
+                padding: 5px;
+            }
+        }
+
         /* Animation styles */
         .bingo-cell.highlight {
             background: #ffd700 !important;
@@ -767,6 +1191,20 @@
             opacity: 0.4;
         }
 
+        .mini-bingo-cell.mini-has-photo {
+            position: relative;
+        }
+
+        .mini-bingo-cell.mini-has-photo::before {
+            content: '📷';
+            position: absolute;
+            top: 1px;
+            right: 1px;
+            font-size: 0.5em;
+            opacity: 0.8;
+            z-index: 1;
+        }
+
         .mini-free-space {
             background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
             color: white;
@@ -1006,6 +1444,7 @@
                 <!-- Section Divider -->
                 <div class="section-divider">
                     <h2>All Bingo Cards</h2>
+                    <p style="text-align: center; color: #999; font-style: italic; margin-top: 10px;">Click on any card to view in fullscreen</p>
                 </div>
 
                 <div id="statisticsGrid">
@@ -1360,8 +1799,16 @@
                             alert('Please randomize your card first before marking items as complete!');
                             return;
                         }
-                        this.classList.toggle('marked');
-                        await saveProgress();
+
+                        // If already marked, open modal to view/edit details
+                        if (this.classList.contains('marked')) {
+                            const itemIndex = i < 12 ? i : i - 1;
+                            await openCompletionModal(this, itemIndex);
+                        } else {
+                            // Not marked yet - open modal to add completion details
+                            const itemIndex = i < 12 ? i : i - 1;
+                            await openCompletionModal(this, itemIndex);
+                        }
                     });
                 }
 
@@ -1370,6 +1817,9 @@
 
             // Load saved progress
             await loadProgress();
+
+            // Load cell details indicators
+            await loadCellDetailsIndicators();
 
             // Update randomize button state
             await updateRandomizeButton();
@@ -2017,6 +2467,12 @@
                     const cardContainer = document.createElement('div');
                     cardContainer.className = 'user-bingo-card-container';
 
+                    // Make entire container clickable to open fullscreen view
+                    cardContainer.style.cursor = 'pointer';
+                    cardContainer.addEventListener('click', function() {
+                        openFullscreenCard(user.id, user.name);
+                    });
+
                     // User name
                     const nameHeader = document.createElement('h3');
                     nameHeader.textContent = user.name;
@@ -2028,6 +2484,7 @@
 
                     // Get marked cells from progress
                     const markedCells = progress.markedCells || [];
+                    const cellDetails = progress.cellDetails || {};
 
                     // Create 25 cells (including free space)
                     let nonFreeSpaceIndex = 0; // Track index for non-free-space cells (0-23)
@@ -2048,6 +2505,13 @@
                             if (markedCells.includes(nonFreeSpaceIndex)) {
                                 cell.classList.add('marked');
                             }
+
+                            // Check if this cell has photos
+                            const details = cellDetails[nonFreeSpaceIndex];
+                            if (details && details.photos && details.photos.length > 0) {
+                                cell.classList.add('mini-has-photo');
+                            }
+
                             nonFreeSpaceIndex++; // Increment only for non-free-space cells
                         }
 
@@ -2095,6 +2559,417 @@
             }
         }
 
+        // ===== COMPLETION DETAILS MODAL FUNCTIONS =====
+
+        let currentModalCellIndex = null;
+        let currentModalCellElement = null;
+        let uploadedPhotos = [];
+
+        // Open completion modal
+        async function openCompletionModal(cellElement, cellIndex) {
+            currentModalCellIndex = cellIndex;
+            currentModalCellElement = cellElement;
+            uploadedPhotos = [];
+
+            const modal = document.getElementById('completionModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const dateInput = document.getElementById('completionDate');
+            const notesInput = document.getElementById('completionNotes');
+            const photoPreviewGrid = document.getElementById('photoPreviewGrid');
+            const saveDetailsBtn = document.getElementById('saveDetailsBtn');
+            const unmarkSection = document.getElementById('unmarkSection');
+
+            // Get cell text for title
+            const cellText = cellElement.textContent.trim();
+
+            // Check if cell is already marked
+            const isMarked = cellElement.classList.contains('marked');
+
+            // Check if cell already has details (viewing mode)
+            const userId = getCurrentUserId();
+            const existingDetails = await apiRequest(`/users/${userId}/cell/${cellIndex}/details`);
+
+            if (isMarked && existingDetails) {
+                // Viewing/editing existing details
+                modalTitle.textContent = 'View/Edit Details';
+                dateInput.value = existingDetails.date || '';
+                notesInput.value = existingDetails.notes || '';
+                uploadedPhotos = existingDetails.photos || [];
+                saveDetailsBtn.textContent = 'Update Details';
+                unmarkSection.style.display = 'flex';
+
+                // Render existing photos
+                renderPhotoPreview();
+            } else if (isMarked && !existingDetails) {
+                // Marked but no details - allow adding details or unmarking
+                modalTitle.textContent = `Add Details: ${cellText}`;
+                dateInput.value = new Date().toISOString().split('T')[0];
+                notesInput.value = '';
+                photoPreviewGrid.innerHTML = '';
+                saveDetailsBtn.textContent = 'Add Details';
+                unmarkSection.style.display = 'flex';
+            } else {
+                // New completion
+                modalTitle.textContent = `Complete: ${cellText}`;
+                dateInput.value = new Date().toISOString().split('T')[0];
+                notesInput.value = '';
+                photoPreviewGrid.innerHTML = '';
+                saveDetailsBtn.textContent = 'Save & Mark Complete';
+                unmarkSection.style.display = 'none';
+            }
+
+            modal.classList.add('active');
+        }
+
+        // Close completion modal
+        function closeCompletionModal() {
+            const modal = document.getElementById('completionModal');
+            modal.classList.remove('active');
+            currentModalCellIndex = null;
+            currentModalCellElement = null;
+            uploadedPhotos = [];
+
+            // Reset form
+            document.getElementById('completionDate').value = '';
+            document.getElementById('completionNotes').value = '';
+            document.getElementById('photoPreviewGrid').innerHTML = '';
+        }
+
+        // Handle photo upload
+        async function handlePhotoUpload(event) {
+            const files = event.target.files;
+
+            for (let file of files) {
+                // Compress and convert to base64
+                const base64 = await compressAndEncodeImage(file);
+                uploadedPhotos.push(base64);
+            }
+
+            renderPhotoPreview();
+
+            // Reset input so the same file can be selected again
+            event.target.value = '';
+        }
+
+        // Compress image and convert to base64
+        function compressAndEncodeImage(file, maxWidth = 1200, quality = 0.8) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const img = new Image();
+
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+
+                        // Calculate new dimensions
+                        if (width > maxWidth) {
+                            height = (height * maxWidth) / width;
+                            width = maxWidth;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // Convert to base64
+                        const base64 = canvas.toDataURL('image/jpeg', quality);
+                        resolve(base64);
+                    };
+
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Render photo preview
+        function renderPhotoPreview() {
+            const photoPreviewGrid = document.getElementById('photoPreviewGrid');
+            photoPreviewGrid.innerHTML = '';
+
+            uploadedPhotos.forEach((photo, index) => {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'photo-preview-item';
+
+                const img = document.createElement('img');
+                img.src = photo;
+                img.style.cursor = 'pointer';
+
+                // Click to view full size
+                img.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    viewPhotoFullscreen(photo);
+                });
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'photo-preview-remove';
+                removeBtn.textContent = '×';
+                removeBtn.onclick = () => removePhoto(index);
+
+                previewItem.appendChild(img);
+                previewItem.appendChild(removeBtn);
+                photoPreviewGrid.appendChild(previewItem);
+            });
+        }
+
+        // Remove photo from array
+        function removePhoto(index) {
+            uploadedPhotos.splice(index, 1);
+            renderPhotoPreview();
+        }
+
+        // Save completion details and mark cell
+        async function saveCompletionDetails() {
+            if (!currentModalCellElement || currentModalCellIndex === null) return;
+
+            const userId = getCurrentUserId();
+            const date = document.getElementById('completionDate').value;
+            const notes = document.getElementById('completionNotes').value;
+
+            // Save details to API
+            await apiRequest(`/users/${userId}/cell/${currentModalCellIndex}/details`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    photos: uploadedPhotos,
+                    date: date,
+                    notes: notes
+                })
+            });
+
+            // Mark cell as complete
+            currentModalCellElement.classList.add('marked');
+
+            // Add indicator if photos were uploaded
+            if (uploadedPhotos.length > 0) {
+                currentModalCellElement.classList.add('cell-has-details');
+            }
+
+            await saveProgress();
+            closeCompletionModal();
+        }
+
+        // Unmark cell and delete details
+        async function unmarkCell() {
+            if (!currentModalCellElement || currentModalCellIndex === null) return;
+
+            // Check if there are actually photos or notes
+            const userId = getCurrentUserId();
+            const details = await apiRequest(`/users/${userId}/cell/${currentModalCellIndex}/details`);
+
+            const hasDetails = details && ((details.photos && details.photos.length > 0) || (details.notes && details.notes.trim()));
+
+            // Only show confirmation if there are photos or notes to delete
+            if (hasDetails) {
+                if (!confirm('Are you sure you want to unmark this item? This will delete all photos and notes.')) {
+                    return;
+                }
+            }
+
+            // Delete cell details from API
+            await apiRequest(`/users/${userId}/cell/${currentModalCellIndex}/details`, {
+                method: 'DELETE'
+            });
+
+            // Unmark cell
+            currentModalCellElement.classList.remove('marked');
+            currentModalCellElement.classList.remove('cell-has-details');
+
+            await saveProgress();
+            closeCompletionModal();
+        }
+
+        // Load cell details indicators
+        async function loadCellDetailsIndicators() {
+            const userId = getCurrentUserId();
+            if (!userId) return;
+
+            const progress = await getUserProgress();
+            if (!progress || !progress.cellDetails) return;
+
+            const cells = document.querySelectorAll('.bingo-cell:not(.free-space)');
+            cells.forEach((cell, index) => {
+                const details = progress.cellDetails[index];
+                if (details && details.photos && details.photos.length > 0) {
+                    cell.classList.add('cell-has-details');
+                }
+            });
+        }
+
+        // ===== PHOTO FULLSCREEN VIEWER FUNCTIONS =====
+
+        // View photo in fullscreen
+        function viewPhotoFullscreen(photoSrc) {
+            const viewer = document.getElementById('photoFullscreenViewer');
+            const img = document.getElementById('photoFullscreenImg');
+            img.src = photoSrc;
+            viewer.classList.add('active');
+        }
+
+        // Close photo fullscreen viewer
+        function closePhotoFullscreen() {
+            const viewer = document.getElementById('photoFullscreenViewer');
+            viewer.classList.remove('active');
+        }
+
+        // ===== FULLSCREEN USER CARD FUNCTIONS =====
+
+        let currentViewingUserId = null;
+
+        // Open fullscreen card view for a user
+        async function openFullscreenCard(userId, userName) {
+            currentViewingUserId = userId;
+
+            const modal = document.getElementById('fullscreenCardModal');
+            const title = document.getElementById('fullscreenCardTitle');
+            const cardContainer = document.getElementById('fullscreenBingoCard');
+
+            // Set title
+            title.textContent = `${userName}'s 2026 Bingo Bucket List`;
+
+            // Fetch user's data
+            const bingoData = await apiRequest(`/users/${userId}/data`);
+            const progress = await apiRequest(`/users/${userId}/progress`);
+
+            // Render the card
+            cardContainer.innerHTML = '';
+
+            const markedCells = progress.markedCells || [];
+            const cellDetails = progress.cellDetails || {};
+
+            for (let i = 0; i < 25; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'fullscreen-bingo-cell';
+
+                // Center cell is FREE SPACE
+                if (i === 12) {
+                    cell.classList.add('fullscreen-free-space');
+                    cell.innerHTML = 'FREE SPACE<br>★';
+                } else {
+                    // Get item index, accounting for FREE SPACE at position 12
+                    const itemIndex = i < 12 ? i : i - 1;
+                    cell.textContent = bingoData.items[itemIndex];
+
+                    // Check if marked
+                    if (markedCells.includes(itemIndex)) {
+                        cell.classList.add('marked');
+
+                        // Check if has details
+                        const details = cellDetails[itemIndex];
+                        if (details && details.photos && details.photos.length > 0) {
+                            cell.classList.add('cell-has-details');
+                        }
+
+                        // Add click handler to view details
+                        cell.addEventListener('click', async function() {
+                            await openCompletionModalReadOnly(userId, itemIndex, bingoData.items[itemIndex]);
+                        });
+                    }
+                }
+
+                cardContainer.appendChild(cell);
+            }
+
+            // Show modal
+            modal.classList.add('active');
+        }
+
+        // Close fullscreen card modal
+        function closeFullscreenCard() {
+            const modal = document.getElementById('fullscreenCardModal');
+            modal.classList.remove('active');
+            currentViewingUserId = null;
+        }
+
+        // Open completion modal in read-only mode for viewing other users' details
+        async function openCompletionModalReadOnly(userId, cellIndex, itemText) {
+            const modal = document.getElementById('completionModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const dateInput = document.getElementById('completionDate');
+            const notesInput = document.getElementById('completionNotes');
+            const photoPreviewGrid = document.getElementById('photoPreviewGrid');
+            const saveDetailsBtn = document.getElementById('saveDetailsBtn');
+            const unmarkSection = document.getElementById('unmarkSection');
+            const photoInput = document.getElementById('photoInput');
+
+            // Fetch details
+            const details = await apiRequest(`/users/${userId}/cell/${cellIndex}/details`);
+
+            if (!details) {
+                alert('No details available for this item.');
+                return;
+            }
+
+            // Set read-only mode
+            modalTitle.textContent = `${itemText}`;
+            dateInput.value = details.date || '';
+            dateInput.disabled = true;
+            notesInput.value = details.notes || '';
+            notesInput.disabled = true;
+            uploadedPhotos = details.photos || [];
+
+            // Update labels to remove "(Optional)"
+            const photoLabel = dateInput.parentElement.nextElementSibling.querySelector('label');
+            const notesLabel = notesInput.parentElement.querySelector('label');
+            photoLabel.textContent = '📷 Photos';
+            notesLabel.textContent = '📝 Notes & Story';
+
+            // Hide action buttons and photo upload
+            saveDetailsBtn.style.display = 'none';
+            unmarkSection.style.display = 'none';
+            photoInput.parentElement.style.display = 'none';
+
+            // Render photos
+            photoPreviewGrid.innerHTML = '';
+            uploadedPhotos.forEach((photo) => {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'photo-preview-item';
+                previewItem.style.cursor = 'pointer';
+
+                const img = document.createElement('img');
+                img.src = photo;
+
+                // Click to view full size
+                img.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    viewPhotoFullscreen(photo);
+                });
+
+                previewItem.appendChild(img);
+                photoPreviewGrid.appendChild(previewItem);
+            });
+
+            modal.classList.add('active');
+
+            // Override close to reset read-only mode
+            const originalClose = window.closeCompletionModal;
+            window.closeCompletionModal = function() {
+                // Reset to normal mode
+                dateInput.disabled = false;
+                notesInput.disabled = false;
+                photoInput.parentElement.style.display = 'block';
+
+                // Restore original labels
+                const photoLabel = dateInput.parentElement.nextElementSibling.querySelector('label');
+                const notesLabel = notesInput.parentElement.querySelector('label');
+                photoLabel.textContent = '📷 Photos (Optional)';
+                notesLabel.textContent = '📝 Notes & Story (Optional)';
+
+                // Call original close
+                originalClose();
+
+                // Restore original close function
+                window.closeCompletionModal = originalClose;
+            };
+        }
+
         // Initialize everything on page load
         window.addEventListener('DOMContentLoaded', async function() {
             initializeCreatorForm();
@@ -2121,5 +2996,62 @@
             }
         });
     </script>
+
+    <!-- Completion Details Modal -->
+    <div id="completionModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Completion Details</h2>
+                <button class="modal-close" onclick="closeCompletionModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-field">
+                    <label>📅 Completion Date</label>
+                    <input type="date" id="completionDate" />
+                </div>
+                <div class="modal-field">
+                    <label>📷 Photos (Optional)</label>
+                    <div class="photo-upload-area" onclick="document.getElementById('photoInput').click()">
+                        <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotoUpload(event)" />
+                        <span class="photo-upload-label">📸 Click to upload photos</span>
+                        <div class="photo-upload-hint">You can upload multiple photos</div>
+                    </div>
+                    <div id="photoPreviewGrid" class="photo-preview-grid"></div>
+                </div>
+                <div class="modal-field">
+                    <label>📝 Notes & Story (Optional)</label>
+                    <textarea id="completionNotes" placeholder="Tell the story of how you completed this item..."></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-button modal-button-secondary" onclick="closeCompletionModal()">Cancel</button>
+                <button class="modal-button modal-button-primary" id="saveDetailsBtn" onclick="saveCompletionDetails()">Save & Mark Complete</button>
+            </div>
+            <div class="modal-actions" id="unmarkSection" style="display: none; margin-top: 10px;">
+                <button class="modal-button modal-button-secondary" onclick="unmarkCell()" style="background: #ff6b6b; color: white;">Unmark This Item</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fullscreen User Card Modal -->
+    <div id="fullscreenCardModal" class="fullscreen-card-modal">
+        <div class="fullscreen-card-container">
+            <div class="fullscreen-card-header">
+                <h2 id="fullscreenCardTitle">User's Bingo Card</h2>
+                <button class="fullscreen-card-close" onclick="closeFullscreenCard()">&times;</button>
+            </div>
+            <div id="fullscreenBingoCard" class="fullscreen-bingo-card">
+                <!-- Card cells will be generated by JavaScript -->
+            </div>
+            <div class="fullscreen-card-hint">
+                Click on completed items (marked in purple) to view their details, photos, and stories!
+            </div>
+        </div>
+    </div>
+
+    <!-- Photo Fullscreen Viewer -->
+    <div id="photoFullscreenViewer" class="photo-fullscreen-viewer" onclick="closePhotoFullscreen()">
+        <img id="photoFullscreenImg" src="" alt="Full size photo">
+    </div>
 </body>
 </html>

@@ -7,10 +7,16 @@ A family-friendly bucket list bingo application with Flask backend for multi-dev
 - 🎯 **Create Custom Bingo Cards** - Add 24 personalized bucket list items
 - 🎲 **Visual Randomizer** - Fun animated randomization of your bingo card
 - 👥 **Multi-User Support** - Create and manage multiple users/family members
+- 📸 **Completion Details** - Add photos, dates, and stories to completed items
+  - Upload multiple photos per item
+  - Record completion dates
+  - Write notes and stories about your achievements
+  - View others' completion details and photos
 - 📊 **Statistics & Leaderboards** - Track progress with:
   - Items completed leaderboard
   - Bingos achieved leaderboard
-  - Visual overview of all users' cards
+  - Visual overview of all users' cards with photo indicators
+  - Click any card to view in fullscreen
 - 💾 **Automatic Sync** - Access your cards from any device on your network
 - 🏆 **Bingo Detection** - Automatically counts rows, columns, and diagonals
 - 🖨️ **Print Support** - Print your bingo cards
@@ -61,7 +67,9 @@ http://localhost:5000
 
 That's it! Your family can now access the bingo app from any device on your local network.
 
-## Migrating Old Data
+## Migrating Data
+
+### From localStorage (Old HTML Version)
 
 If you have data from the old localStorage version:
 
@@ -69,6 +77,16 @@ If you have data from the old localStorage version:
 2. Open the old HTML file (`bucket_list_bingo.html`) in your browser
 3. Open `migrate_localStorage.html` in another tab
 4. Follow the migration instructions on the page
+
+### Updating Existing Database
+
+If you're upgrading from an earlier version without the photos/stories feature, run the migration script:
+
+```bash
+python migrate_add_cell_details.py
+```
+
+This will add the necessary database column to support completion details without losing any existing data.
 
 ## Accessing from Other Devices
 
@@ -97,12 +115,22 @@ To make this accessible from anywhere (not just your local network), you can dep
 
 1. **Create a User** - Click "Create New Card" and fill in your name and 24 bucket list items
 2. **Randomize** - Click the "Randomize!" button to shuffle your card (one-time only)
-3. **Mark Progress** - Click on cells as you complete items
-4. **View Statistics** - Check the "Leaderboard" tab to see:
+3. **Mark Progress & Add Details** - Click on any cell to:
+   - Mark it as complete
+   - Upload photos of your achievement
+   - Record the completion date
+   - Write notes and stories about the experience
+   - Or just quickly mark it complete without details
+4. **View Others' Achievements** - In the Statistics tab:
+   - Click any user's card to view it in fullscreen
+   - Click their completed items to see photos, dates, and stories
+   - Photos can be clicked to view full-size
+5. **View Statistics** - Check the "Statistics" tab to see:
    - Rankings by items completed
    - Rankings by bingos achieved
    - Visual overview of all users' progress
-5. **Switch Users** - Use the "Switch User" tab to view or manage different family members
+   - 📷 icon indicates items with photos
+6. **Switch Users** - Use the "Switch User" tab to view or manage different family members
 
 ## Project Structure
 
@@ -113,10 +141,12 @@ bucket_list_bingo/
 ├── config.py                     # Configuration settings
 ├── requirements.txt              # Python dependencies
 ├── README.md                     # This file
+├── migrate_add_cell_details.py   # Database migration script for new features
 ├── migrate_localStorage.html     # Migration tool for old data
-├── bingo.db                      # SQLite database (created automatically)
+├── instance/
+│   └── bingo.db                 # SQLite database (created automatically)
 ├── static/
-│   └── index.html               # Frontend application
+│   └── index.html               # Frontend application (single-page app)
 └── bucket_list_bingo.html       # Old version (for reference/migration)
 ```
 
@@ -124,24 +154,37 @@ bucket_list_bingo/
 
 The Flask backend provides these REST API endpoints:
 
+**User Management:**
 - `GET /api/users` - Get all users
 - `POST /api/users` - Create new user with bingo data
 - `GET /api/users/<user_id>` - Get specific user
 - `DELETE /api/users/<user_id>` - Delete user and all data
+
+**Bingo Card Data:**
 - `GET /api/users/<user_id>/data` - Get user's bingo items
 - `PUT /api/users/<user_id>/data` - Update user's bingo items
+
+**Progress Tracking:**
 - `GET /api/users/<user_id>/progress` - Get user's progress
 - `PUT /api/users/<user_id>/progress` - Update user's progress
 - `POST /api/users/<user_id>/randomize` - Mark card as randomized
 - `POST /api/users/<user_id>/reset-progress` - Reset user's progress
 
+**Completion Details (Photos & Stories):**
+- `GET /api/users/<user_id>/cell/<cell_index>/details` - Get details for a specific cell
+- `PUT /api/users/<user_id>/cell/<cell_index>/details` - Update details for a specific cell
+- `DELETE /api/users/<user_id>/cell/<cell_index>/details` - Delete details for a specific cell
+
 ## Database
 
-The application uses SQLite (stored in `bingo.db`) with three tables:
+The application uses SQLite (stored in `instance/bingo.db`) with three tables:
 
 - **users** - User information (id, name, created_at)
-- **bingo_data** - Bingo card items for each user
-- **progress** - Marked cells and randomization status
+- **bingo_data** - Bingo card items for each user (items as JSON, year)
+- **progress** - Progress tracking including:
+  - Marked cells (which items are completed)
+  - Randomization status
+  - Cell details (photos, completion dates, notes) stored as JSON
 
 ## Troubleshooting
 
@@ -160,7 +203,14 @@ app.run(debug=True, host='0.0.0.0', port=5001)  # Change to 5001 or any availabl
 
 ### Database errors?
 
-Delete `bingo.db` and restart the server - it will create a fresh database.
+Delete `instance/bingo.db` and restart the server - it will create a fresh database.
+
+### Database getting too large?
+
+Photos are stored as base64-encoded images in the database. If your database grows too large:
+1. Photos are automatically compressed when uploaded (max 1200px width, 80% quality)
+2. For very large databases, consider backing up and starting fresh each year
+3. The database file is located at `instance/bingo.db` for easy backup
 
 ## Development
 

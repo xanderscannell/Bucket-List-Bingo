@@ -3,6 +3,8 @@ from flask_cors import CORS
 from models import db, User, BingoData, Progress
 from config import Config
 import json
+import os
+import base64
 from datetime import datetime, timezone
 
 app = Flask(__name__, static_folder='static')
@@ -111,6 +113,8 @@ def update_user_progress(user_id):
 
     if 'markedCells' in data:
         progress.marked_cells = json.dumps(data['markedCells'])
+    if 'cellDetails' in data:
+        progress.cell_details = json.dumps(data['cellDetails'])
     if 'randomized' in data:
         progress.randomized = data['randomized']
 
@@ -141,6 +145,56 @@ def reset_user_progress(user_id):
         db.session.commit()
 
     return jsonify(progress.to_dict() if progress else {'markedCells': [], 'randomized': False})
+
+@app.route('/api/users/<user_id>/cell/<int:cell_index>/details', methods=['PUT'])
+def update_cell_details(user_id, cell_index):
+    """Update details for a specific cell"""
+    data = request.json
+    progress = Progress.query.filter_by(user_id=user_id).first()
+
+    if not progress:
+        progress = Progress(user_id=user_id)
+        db.session.add(progress)
+
+    # Get existing cell details
+    cell_details = json.loads(progress.cell_details) if progress.cell_details else {}
+
+    # Update details for this cell
+    cell_details[str(cell_index)] = {
+        'photos': data.get('photos', []),  # Array of base64 encoded images
+        'date': data.get('date'),
+        'notes': data.get('notes', '')
+    }
+
+    progress.cell_details = json.dumps(cell_details)
+    db.session.commit()
+
+    return jsonify(progress.to_dict())
+
+@app.route('/api/users/<user_id>/cell/<int:cell_index>/details', methods=['GET'])
+def get_cell_details(user_id, cell_index):
+    """Get details for a specific cell"""
+    progress = Progress.query.filter_by(user_id=user_id).first()
+
+    if not progress or not progress.cell_details:
+        return jsonify(None)
+
+    cell_details = json.loads(progress.cell_details)
+    return jsonify(cell_details.get(str(cell_index)))
+
+@app.route('/api/users/<user_id>/cell/<int:cell_index>/details', methods=['DELETE'])
+def delete_cell_details(user_id, cell_index):
+    """Delete details for a specific cell"""
+    progress = Progress.query.filter_by(user_id=user_id).first()
+
+    if progress and progress.cell_details:
+        cell_details = json.loads(progress.cell_details)
+        if str(cell_index) in cell_details:
+            del cell_details[str(cell_index)]
+            progress.cell_details = json.dumps(cell_details)
+            db.session.commit()
+
+    return jsonify({'success': True})
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
