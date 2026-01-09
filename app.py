@@ -265,12 +265,10 @@ def get_activity_feed():
             if not details.get('date'):
                 continue
 
-            # Get the item text (accounting for free space at index 12)
-            if cell_index < 12:
-                item_text = items[cell_index]
-            else:
-                # Skip free space, or get item after it
-                item_text = items[cell_index - 1] if cell_index > 12 else "Free Space"
+            # Get the item text
+            # Note: cell_index is an item index (0-23), not a grid position
+            # The free space (grid position 12) is never stored in cell_details
+            item_text = items[cell_index]
 
             # Skip free space
             if cell_index == 12:

@@ -1442,6 +1442,7 @@
             /* Text truncation after 2-3 lines */
             display: -webkit-box;
             -webkit-line-clamp: 3;
+            line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -3265,13 +3266,9 @@
             const unmarkSection = document.getElementById('unmarkSection');
             const photoInput = document.getElementById('photoInput');
 
-            // Get the item text (accounting for free space at index 12)
-            let itemText;
-            if (cellIndex < 12) {
-                itemText = bingoData.items[cellIndex];
-            } else {
-                itemText = bingoData.items[cellIndex - 1];
-            }
+            // Get the item text
+            // Note: cellIndex is an item index (0-23), not a grid position
+            const itemText = bingoData.items[cellIndex];
 
             modalTitle.textContent = `${bingoData.userName}'s Completion: ${itemText}`;
             dateInput.value = cellDetails.date || '';
