@@ -3334,6 +3334,24 @@
                 }
             }
         });
+
+        // Global escape key handler to close modals
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                // Check which modal is open (in order of priority - close topmost first)
+                const photoViewer = document.getElementById('photoFullscreenViewer');
+                const completionModal = document.getElementById('completionModal');
+                const fullscreenCardModal = document.getElementById('fullscreenCardModal');
+
+                if (photoViewer && photoViewer.classList.contains('active')) {
+                    closePhotoFullscreen();
+                } else if (completionModal && completionModal.classList.contains('active')) {
+                    closeCompletionModal();
+                } else if (fullscreenCardModal && fullscreenCardModal.classList.contains('active')) {
+                    closeFullscreenCard();
+                }
+            }
+        });
     </script>
 
     <!-- Completion Details Modal -->
