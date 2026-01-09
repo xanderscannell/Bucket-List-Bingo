@@ -59,7 +59,7 @@ with app.app_context():
 
     # Create tables (only creates missing tables, doesn't alter existing ones)
     db.create_all()
-    print("✓ Database schema validated successfully")
+    print("Database schema validated successfully")
 
 # Serve the frontend
 @app.route('/')
@@ -238,6 +238,65 @@ def delete_cell_details(user_id, cell_index):
             db.session.commit()
 
     return jsonify({'success': True})
+
+@app.route('/api/activity/feed', methods=['GET'])
+def get_activity_feed():
+    """Get chronological feed of all completions across all users"""
+    activities = []
+
+    # Query all users with their progress and bingo data
+    users = User.query.all()
+
+    for user in users:
+        progress = Progress.query.filter_by(user_id=user.id).first()
+        bingo_data = BingoData.query.filter_by(user_id=user.id).first()
+
+        if not progress or not progress.cell_details or not bingo_data:
+            continue
+
+        cell_details = json.loads(progress.cell_details)
+        items = json.loads(bingo_data.items)
+
+        # Extract each completion
+        for cell_index_str, details in cell_details.items():
+            cell_index = int(cell_index_str)
+
+            # Skip if no date (shouldn't happen with new flow)
+            if not details.get('date'):
+                continue
+
+            # Get the item text (accounting for free space at index 12)
+            if cell_index < 12:
+                item_text = items[cell_index]
+            else:
+                # Skip free space, or get item after it
+                item_text = items[cell_index - 1] if cell_index > 12 else "Free Space"
+
+            # Skip free space
+            if cell_index == 12:
+                continue
+
+            # Get first photo as thumbnail if available
+            photos = details.get('photos', [])
+            photo_thumbnail = photos[0] if photos else None
+
+            activity = {
+                'userId': user.id,
+                'userName': user.name,
+                'itemText': item_text,
+                'cellIndex': cell_index,
+                'date': details['date'],
+                'photoThumbnail': photo_thumbnail,
+                'hasPhotos': len(photos) > 0,
+                'notes': details.get('notes', '')
+            }
+
+            activities.append(activity)
+
+    # Sort by date (most recent first), with user ID as tiebreaker
+    activities.sort(key=lambda x: (x['date'], x['userId']), reverse=True)
+
+    return jsonify(activities)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
