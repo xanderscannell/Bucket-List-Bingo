@@ -2845,6 +2845,24 @@
             document.getElementById('completionDate').value = '';
             document.getElementById('completionNotes').value = '';
             document.getElementById('photoPreviewGrid').innerHTML = '';
+
+            // Reset all form elements to editable state
+            const dateInput = document.getElementById('completionDate');
+            const notesInput = document.getElementById('completionNotes');
+            const saveDetailsBtn = document.getElementById('saveDetailsBtn');
+            const unmarkSection = document.getElementById('unmarkSection');
+            const photoInput = document.getElementById('photoInput');
+
+            dateInput.disabled = false;
+            notesInput.disabled = false;
+            saveDetailsBtn.style.display = 'block';
+            photoInput.parentElement.style.display = 'block';
+
+            // Reset labels to default
+            const photoLabel = dateInput.parentElement.nextElementSibling?.querySelector('label');
+            const notesLabel = notesInput.parentElement?.querySelector('label');
+            if (photoLabel) photoLabel.textContent = '📷 Photos (Optional)';
+            if (notesLabel) notesLabel.textContent = '📝 Notes & Story (Optional)';
         }
 
         // Handle photo upload
@@ -3169,27 +3187,6 @@
             });
 
             modal.classList.add('active');
-
-            // Override close to reset read-only mode
-            const originalClose = window.closeCompletionModal;
-            window.closeCompletionModal = function() {
-                // Reset to normal mode
-                dateInput.disabled = false;
-                notesInput.disabled = false;
-                photoInput.parentElement.style.display = 'block';
-
-                // Restore original labels
-                const photoLabel = dateInput.parentElement.nextElementSibling.querySelector('label');
-                const notesLabel = notesInput.parentElement.querySelector('label');
-                photoLabel.textContent = '📷 Photos (Optional)';
-                notesLabel.textContent = '📝 Notes & Story (Optional)';
-
-                // Call original close
-                originalClose();
-
-                // Restore original close function
-                window.closeCompletionModal = originalClose;
-            };
         }
 
         // Activity Feed Functions
@@ -3307,25 +3304,6 @@
             });
 
             modal.classList.add('active');
-
-            // Override close to reset read-only mode
-            const originalClose = window.closeCompletionModal;
-            window.closeCompletionModal = function() {
-                // Reset to normal mode
-                dateInput.disabled = false;
-                notesInput.disabled = false;
-                photoInput.parentElement.style.display = 'block';
-
-                // Restore original labels
-                photoLabel.textContent = '📷 Photos (Optional)';
-                notesLabel.textContent = '📝 Notes & Story (Optional)';
-
-                // Call original close
-                originalClose();
-
-                // Restore original close function
-                window.closeCompletionModal = originalClose;
-            };
         }
 
         // Initialize everything on page load
