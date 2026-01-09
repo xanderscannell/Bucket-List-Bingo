@@ -3222,7 +3222,9 @@
 
         function renderActivityCard(activity) {
             // Format the date nicely
-            const date = new Date(activity.date);
+            // Parse date as local date (YYYY-MM-DD) to avoid timezone issues
+            const [year, month, day] = activity.date.split('-').map(Number);
+            const date = new Date(year, month - 1, day);  // month is 0-indexed
             const formattedDate = date.toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'long',
