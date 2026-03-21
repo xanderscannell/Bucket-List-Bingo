@@ -1700,13 +1700,14 @@
 
         .activity-card {
             background: white;
-            border-radius: 4px;
+            border-radius: 8px;
             padding: 18px;
             display: flex;
             flex-direction: row-reverse;
-            gap: 15px;
+            gap: 18px;
             box-shadow: 3px 3px 0 var(--cream-dark);
-            border: 2px solid var(--kraft);
+            border: 2px solid var(--kraft-light);
+            border-left: 5px solid var(--kraft);
             transition: all 0.2s ease;
             cursor: pointer;
             align-items: flex-start;
@@ -1717,14 +1718,20 @@
             box-shadow: 5px 5px 0 var(--cream-dark);
         }
 
+        /* Color-code left border by user */
+        .activity-card[data-user-color="0"] { border-left-color: var(--terracotta); }
+        .activity-card[data-user-color="1"] { border-left-color: var(--sage); }
+        .activity-card[data-user-color="2"] { border-left-color: var(--golden); }
+        .activity-card[data-user-color="3"] { border-left-color: var(--dusty-rose); }
+
         .activity-thumbnail {
-            width: 100px;
-            height: 100px;
-            border-radius: 4px;
+            width: 120px;
+            height: 120px;
+            border-radius: 8px;
             object-fit: cover;
             flex-shrink: 0;
             border: 3px solid var(--cream-dark);
-            box-shadow: 2px 2px 6px var(--paper-shadow);
+            box-shadow: 2px 2px 8px var(--paper-shadow);
         }
 
         .activity-content {
@@ -1732,21 +1739,44 @@
             min-width: 0;
         }
 
-        .activity-meta {
-            font-size: 0.9em;
-            color: var(--terracotta);
+        .activity-user-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 10px 3px 3px;
+            border-radius: 20px;
+            font-size: 0.8em;
             font-weight: 700;
             margin-bottom: 8px;
-            font-family: var(--font-display);
-            font-size: 1.1em;
         }
+
+        .activity-user-initial {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75em;
+            font-weight: 800;
+        }
+
+        /* User chip color variants */
+        .activity-user-chip[data-color="0"] { background: rgba(199, 93, 58, 0.12); color: var(--terracotta); }
+        .activity-user-chip[data-color="0"] .activity-user-initial { background: var(--terracotta); }
+        .activity-user-chip[data-color="1"] { background: rgba(125, 154, 120, 0.12); color: var(--sage-dark); }
+        .activity-user-chip[data-color="1"] .activity-user-initial { background: var(--sage); }
+        .activity-user-chip[data-color="2"] { background: rgba(212, 160, 60, 0.12); color: #9a7520; }
+        .activity-user-chip[data-color="2"] .activity-user-initial { background: var(--golden); }
+        .activity-user-chip[data-color="3"] { background: rgba(196, 147, 141, 0.15); color: #8b5a55; }
+        .activity-user-chip[data-color="3"] .activity-user-initial { background: var(--dusty-rose); }
 
         .activity-item {
             font-size: 1.05em;
             color: var(--ink);
             margin-bottom: 8px;
             font-weight: 600;
-            /* Text truncation after 2-3 lines */
             display: -webkit-box;
             -webkit-line-clamp: 3;
             line-clamp: 3;
@@ -1754,10 +1784,28 @@
             overflow: hidden;
         }
 
-        .activity-date {
+        .activity-notes-preview {
             font-size: 0.85em;
             color: var(--ink-light);
+            margin-bottom: 6px;
             font-style: italic;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .activity-date {
+            font-size: 0.8em;
+            color: var(--ink-light);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .activity-date::before {
+            content: '\1F552';
+            font-size: 0.9em;
+            font-style: normal;
         }
 
         .empty-state {
@@ -1779,8 +1827,8 @@
             }
 
             .activity-thumbnail {
-                width: 80px;
-                height: 80px;
+                width: 90px;
+                height: 90px;
             }
         }
 
@@ -3601,29 +3649,52 @@
             }
         }
 
-        function renderActivityCard(activity) {
-            // Format the date nicely
-            // Parse date as local date (YYYY-MM-DD) to avoid timezone issues
-            const [year, month, day] = activity.date.split('-').map(Number);
-            const date = new Date(year, month - 1, day);  // month is 0-indexed
-            const formattedDate = date.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
+        function timeAgo(dateString) {
+            const [year, month, day] = dateString.split('-').map(Number);
+            const date = new Date(year, month - 1, day);
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const diffDays = Math.floor((today - date) / (1000 * 60 * 60 * 24));
 
-            // Create thumbnail HTML if photo exists
+            if (diffDays === 0) return 'Today';
+            if (diffDays === 1) return 'Yesterday';
+            if (diffDays < 7) return `${diffDays} days ago`;
+            if (diffDays < 14) return '1 week ago';
+            if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+            // Fall back to formatted date for older items
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function userColorIndex(name) {
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            return Math.abs(hash) % 4;
+        }
+
+        function renderActivityCard(activity) {
+            const relativeDate = timeAgo(activity.date);
+            const colorIdx = userColorIndex(activity.userName);
+            const initial = activity.userName.charAt(0).toUpperCase();
+
             const thumbnailHTML = activity.photoThumbnail
                 ? `<img src="${activity.photoThumbnail}" alt="Completion photo" class="activity-thumbnail">`
                 : '';
 
+            const notesHTML = activity.notes && activity.notes.trim()
+                ? `<div class="activity-notes-preview">"${activity.notes.trim()}"</div>`
+                : '';
+
             return `
-                <div class="activity-card" onclick="viewActivityDetails('${activity.userId}', ${activity.cellIndex})">
+                <div class="activity-card" data-user-color="${colorIdx}" onclick="viewActivityDetails('${activity.userId}', ${activity.cellIndex})">
                     ${thumbnailHTML}
                     <div class="activity-content">
-                        <div class="activity-meta">${activity.userName} completed:</div>
+                        <div class="activity-user-chip" data-color="${colorIdx}">
+                            <span class="activity-user-initial">${initial}</span>
+                            ${activity.userName}
+                        </div>
                         <div class="activity-item">${activity.itemText}</div>
-                        <div class="activity-date">${formattedDate}</div>
+                        ${notesHTML}
+                        <div class="activity-date">${relativeDate}</div>
                     </div>
                 </div>
             `;
