@@ -1888,17 +1888,40 @@
             font-style: normal;
         }
 
+        /* ── Styled Empty States ── */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
             color: var(--ink-light);
-            font-size: 1.2em;
+        }
+
+        .empty-state-icon {
+            font-size: 3em;
+            display: block;
+            margin-bottom: 12px;
+            opacity: 0.7;
+        }
+
+        .empty-state-title {
+            font-family: var(--font-display);
+            font-size: 1.6em;
+            color: var(--ink);
+            margin: 0 0 8px 0;
+            font-weight: 700;
+        }
+
+        .empty-state-desc {
+            font-size: 0.95em;
+            color: var(--ink-light);
+            margin: 0 0 20px 0;
+            line-height: 1.5;
         }
 
         .empty-state p {
             margin: 0;
             opacity: 0.9;
         }
+        /* ── End Empty States ── */
 
         /* Mobile adjustments - keep similar to desktop */
         @media (max-width: 768px) {
@@ -2065,7 +2088,10 @@
                 </div>
 
                 <div id="activityEmptyState" class="empty-state" style="display: none;">
-                    <p>No activities yet! Start completing items.</p>
+                    <span class="empty-state-icon">&#x1F4F8;</span>
+                    <h3 class="empty-state-title">No adventures yet!</h3>
+                    <p class="empty-state-desc">Complete items on your bingo card to see them here.</p>
+                    <button class="btn btn-primary" onclick="switchView('card')">Go to My Card</button>
                 </div>
             </div>
         </div>
@@ -2425,7 +2451,7 @@
             const currentId = getCurrentUserId();
 
             if (users.length === 0) {
-                usersList.innerHTML = '<div class="no-users-message">No users yet. Create your first user to get started!</div>';
+                usersList.innerHTML = '<div class="empty-state"><span class="empty-state-icon">&#x1F44B;</span><h3 class="empty-state-title">No one here yet!</h3><p class="empty-state-desc">Create your first bingo card to get started.</p><button class="btn btn-primary" onclick="switchView(\'creator\')">Create First Card</button></div>';
                 return;
             }
 
@@ -3049,7 +3075,7 @@
             container.innerHTML = '';
 
             if (sortedUsers.length === 0) {
-                container.innerHTML = '<div class="no-users-message">No data</div>';
+                container.innerHTML = '<div class="empty-state" style="padding:30px 10px"><span class="empty-state-icon" style="font-size:2em">&#x1F3C6;</span><p class="empty-state-desc" style="margin:0">No completions yet</p></div>';
                 return;
             }
 
@@ -3160,9 +3186,9 @@
                 const users = await getAllUsers();
 
                 if (users.length === 0) {
-                    statisticsGrid.innerHTML = '<div class="no-users-message">No users yet. Create your first user to get started!</div>';
-                    itemsLeaderboard.innerHTML = '<div class="no-users-message">No data</div>';
-                    bingosLeaderboard.innerHTML = '<div class="no-users-message">No data</div>';
+                    statisticsGrid.innerHTML = '<div class="empty-state"><span class="empty-state-icon">&#x1F3AF;</span><h3 class="empty-state-title">No cards yet!</h3><p class="empty-state-desc">Create a bingo card to see the overview.</p><button class="btn btn-primary" onclick="switchView(\'creator\')">Create a Card</button></div>';
+                    itemsLeaderboard.innerHTML = '<div class="empty-state"><span class="empty-state-icon">&#x1F3C6;</span><h3 class="empty-state-title">No completions yet</h3><p class="empty-state-desc">Start checking off items!</p></div>';
+                    bingosLeaderboard.innerHTML = '<div class="empty-state"><span class="empty-state-icon">&#x1F3C6;</span><h3 class="empty-state-title">No bingos yet</h3><p class="empty-state-desc">Get 5 in a row!</p></div>';
                     return;
                 }
 
@@ -3737,7 +3763,7 @@
             } catch (error) {
                 console.error('Error loading activity feed:', error);
                 const container = document.getElementById('activityFeedContainer');
-                container.innerHTML = '<div class="empty-state"><p>Error loading activity feed</p></div>';
+                container.innerHTML = '<div class="empty-state"><span class="empty-state-icon">&#x26A0;&#xFE0F;</span><h3 class="empty-state-title">Oops!</h3><p class="empty-state-desc">Could not load the activity feed. Try refreshing.</p></div>';
             }
         }
 
