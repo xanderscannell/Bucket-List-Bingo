@@ -947,12 +947,49 @@
         }
 
         .photo-fullscreen-viewer img {
-            max-width: 90%;
-            max-height: 90%;
+            max-width: 85%;
+            max-height: 85%;
             object-fit: contain;
             border-radius: 4px;
             box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
             border: 6px solid white;
+        }
+
+        .photo-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: none;
+            font-size: 2em;
+            padding: 15px 18px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s;
+            z-index: 5001;
+            backdrop-filter: blur(4px);
+        }
+
+        .photo-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .photo-nav-prev { left: 15px; }
+        .photo-nav-next { right: 15px; }
+
+        .photo-counter {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9em;
+            font-family: var(--font-body);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 5px 14px;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
         }
 
         /* Fullscreen User Card Modal */
@@ -3671,10 +3708,10 @@
                 img.src = photo;
                 img.style.cursor = 'pointer';
 
-                // Click to view full size
+                // Click to view full size with gallery navigation
                 img.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    viewPhotoFullscreen(photo);
+                    viewPhotoFullscreen(photo, uploadedPhotos);
                 });
 
                 const removeBtn = document.createElement('button');
@@ -3792,18 +3829,42 @@
 
         // ===== PHOTO FULLSCREEN VIEWER FUNCTIONS =====
 
-        // View photo in fullscreen
-        function viewPhotoFullscreen(photoSrc) {
-            const viewer = document.getElementById('photoFullscreenViewer');
-            const img = document.getElementById('photoFullscreenImg');
-            img.src = photoSrc;
-            viewer.classList.add('active');
+        let currentPhotoGallery = [];
+        let currentPhotoIndex = 0;
+
+        function viewPhotoFullscreen(photoSrc, gallery) {
+            currentPhotoGallery = gallery || [photoSrc];
+            currentPhotoIndex = currentPhotoGallery.indexOf(photoSrc);
+            if (currentPhotoIndex === -1) currentPhotoIndex = 0;
+            showCurrentPhoto();
+            document.getElementById('photoFullscreenViewer').classList.add('active');
         }
 
-        // Close photo fullscreen viewer
+        function showCurrentPhoto() {
+            const img = document.getElementById('photoFullscreenImg');
+            const counter = document.getElementById('photoCounter');
+            const prevBtn = document.getElementById('photoNavPrev');
+            const nextBtn = document.getElementById('photoNavNext');
+
+            img.src = currentPhotoGallery[currentPhotoIndex];
+
+            const hasMultiple = currentPhotoGallery.length > 1;
+            prevBtn.style.display = hasMultiple ? 'block' : 'none';
+            nextBtn.style.display = hasMultiple ? 'block' : 'none';
+            counter.style.display = hasMultiple ? 'block' : 'none';
+            if (hasMultiple) {
+                counter.textContent = `${currentPhotoIndex + 1} / ${currentPhotoGallery.length}`;
+            }
+        }
+
+        function navigatePhoto(direction) {
+            currentPhotoIndex = (currentPhotoIndex + direction + currentPhotoGallery.length) % currentPhotoGallery.length;
+            showCurrentPhoto();
+        }
+
         function closePhotoFullscreen() {
-            const viewer = document.getElementById('photoFullscreenViewer');
-            viewer.classList.remove('active');
+            document.getElementById('photoFullscreenViewer').classList.remove('active');
+            currentPhotoGallery = [];
         }
 
         // ===== FULLSCREEN USER CARD FUNCTIONS =====
@@ -3923,10 +3984,9 @@
                 const img = document.createElement('img');
                 img.src = photo;
 
-                // Click to view full size
                 img.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    viewPhotoFullscreen(photo);
+                    viewPhotoFullscreen(photo, uploadedPhotos);
                 });
 
                 previewItem.appendChild(img);
@@ -4063,10 +4123,9 @@
                 const img = document.createElement('img');
                 img.src = photo;
 
-                // Click to view full size
                 img.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    viewPhotoFullscreen(photo);
+                    viewPhotoFullscreen(photo, uploadedPhotos);
                 });
 
                 previewItem.appendChild(img);
@@ -4105,15 +4164,22 @@
             }
         });
 
-        // Global escape key handler to close modals
+        // Global keyboard handler for modals and photo navigation
         document.addEventListener('keydown', function(event) {
+            const photoViewer = document.getElementById('photoFullscreenViewer');
+            const isPhotoViewerOpen = photoViewer && photoViewer.classList.contains('active');
+
+            // Arrow keys for photo navigation
+            if (isPhotoViewerOpen && currentPhotoGallery.length > 1) {
+                if (event.key === 'ArrowLeft') { navigatePhoto(-1); return; }
+                if (event.key === 'ArrowRight') { navigatePhoto(1); return; }
+            }
+
             if (event.key === 'Escape') {
-                // Check which modal is open (in order of priority - close topmost first)
-                const photoViewer = document.getElementById('photoFullscreenViewer');
                 const completionModal = document.getElementById('completionModal');
                 const fullscreenCardModal = document.getElementById('fullscreenCardModal');
 
-                if (photoViewer && photoViewer.classList.contains('active')) {
+                if (isPhotoViewerOpen) {
                     closePhotoFullscreen();
                 } else if (completionModal && completionModal.classList.contains('active')) {
                     closeCompletionModal();
@@ -4185,7 +4251,10 @@
 
     <!-- Photo Fullscreen Viewer -->
     <div id="photoFullscreenViewer" class="photo-fullscreen-viewer" onclick="closePhotoFullscreen()">
-        <img id="photoFullscreenImg" src="" alt="Full size photo">
+        <button class="photo-nav-btn photo-nav-prev" id="photoNavPrev" onclick="event.stopPropagation(); navigatePhoto(-1)">&#x276E;</button>
+        <img id="photoFullscreenImg" src="" alt="Full size photo" onclick="event.stopPropagation()">
+        <button class="photo-nav-btn photo-nav-next" id="photoNavNext" onclick="event.stopPropagation(); navigatePhoto(1)">&#x276F;</button>
+        <div class="photo-counter" id="photoCounter"></div>
     </div>
 </body>
 </html>
