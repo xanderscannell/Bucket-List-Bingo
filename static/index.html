@@ -1949,6 +1949,172 @@
             pointer-events: none;
             border-radius: 4px;
         }
+        .statistics-hint {
+            text-align: center;
+            color: var(--ink-light);
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        /* Dark mode toggle button */
+        .dark-mode-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 6px 10px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            line-height: 1;
+        }
+
+        .dark-mode-toggle:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* ── Dark Mode ── */
+        .dark-mode {
+            --cream: #1a1612;
+            --cream-dark: #252018;
+            --kraft: #8a7040;
+            --kraft-light: #3a3020;
+            --kraft-dark: #6a5520;
+            --terracotta: #e07050;
+            --terracotta-light: #f09878;
+            --sage: #7da878;
+            --sage-light: #90c08a;
+            --sage-dark: #5a8356;
+            --dusty-rose: #d0a098;
+            --dusty-rose-light: #c0908a;
+            --golden: #e0b050;
+            --golden-light: #c89838;
+            --ink: #e8ddd0;
+            --ink-light: #b0a090;
+            --paper-shadow: rgba(0, 0, 0, 0.3);
+            color-scheme: dark;
+        }
+
+        /* Override hardcoded whites in dark mode */
+        .dark-mode .container,
+        .dark-mode .modal-content,
+        .dark-mode .leaderboard,
+        .dark-mode .activity-card,
+        .dark-mode .skeleton-user-card,
+        .dark-mode .skeleton-activity-card,
+        .dark-mode .skeleton-stats-card,
+        .dark-mode .user-card,
+        .dark-mode .photo-upload-area,
+        .dark-mode .modal-field input[type="date"],
+        .dark-mode .modal-field textarea {
+            background: #252018;
+        }
+
+        .dark-mode .bingo-cell,
+        .dark-mode .btn-outline {
+            background: #2a231c;
+            color: var(--ink);
+        }
+
+        .dark-mode .btn-ghost {
+            background: #2a231c;
+            color: var(--ink);
+        }
+
+        .dark-mode .btn-ghost:hover:not(:disabled) {
+            background: #352e25;
+        }
+
+        .dark-mode .modal-zone {
+            background: #1a1612;
+        }
+
+        .dark-mode .leaderboard-item {
+            background: #1a1612;
+        }
+
+        .dark-mode .leaderboard-item:hover {
+            background: #2a231c;
+        }
+
+        .dark-mode .leaderboard-item:nth-child(1) {
+            background: rgba(212, 160, 60, 0.08);
+        }
+
+        .dark-mode .leaderboard-progress-bar {
+            background: #2a231c;
+        }
+
+        .dark-mode .bingo-card {
+            background: #2a231c;
+        }
+
+        .dark-mode .bingo-cell:hover {
+            background: #352e25;
+        }
+
+        .dark-mode .bingo-cell.marked {
+            background: var(--sage-dark);
+        }
+
+        .dark-mode .navbar {
+            background: linear-gradient(180deg, #2a231c 0%, #1a1612 100%);
+            border-bottom-color: #3a3020;
+        }
+
+        .dark-mode .sidebar {
+            background: #1a1612;
+        }
+
+        .dark-mode .hamburger-menu {
+            background: #2a231c;
+        }
+
+        .dark-mode .hamburger-menu span {
+            background: var(--ink);
+        }
+
+        .dark-mode .fullscreen-card-container {
+            background: #252018;
+        }
+
+        .dark-mode .fullscreen-bingo-cell {
+            background: #2a231c;
+            color: var(--ink);
+        }
+
+        .dark-mode .user-card.active {
+            border-color: var(--terracotta);
+        }
+
+        .dark-mode .photo-preview-item {
+            border-color: #3a3020;
+        }
+
+        .dark-mode body,
+        .dark-mode {
+            background-blend-mode: overlay;
+        }
+
+        /* Dark mode skeleton shimmer */
+        .dark-mode .skeleton {
+            background: linear-gradient(90deg, #252018 25%, #2a231c 50%, #252018 75%);
+            background-size: 800px 100%;
+        }
+
+        /* Ensure print is always light */
+        @media print {
+            .dark-mode {
+                --cream: #faf6f1;
+                --cream-dark: #f0e9df;
+                --ink: #3d3229;
+                --ink-light: #6b5d4d;
+            }
+            .dark-mode .container,
+            .dark-mode .bingo-cell {
+                background: white;
+            }
+        }
+        /* ── End Dark Mode ── */
     </style>
 </head>
 <body>
@@ -1969,6 +2135,7 @@
         <button class="btn btn-ghost nav-button" onclick="switchView('statistics'); closeSidebar();">Overview</button>
         <button class="btn btn-ghost nav-button" onclick="switchView('activity'); closeSidebar();">Activity Feed</button>
         <button class="btn btn-ghost nav-button" id="navCreatorMobile" onclick="switchView('creator'); closeSidebar();">Create New Card</button>
+        <button class="dark-mode-toggle" id="darkToggleMobile" onclick="toggleDarkMode()" title="Toggle dark mode">&#x1F319;</button>
     </div>
 
     <!-- Backdrop -->
@@ -1980,6 +2147,7 @@
         <button class="btn btn-ghost nav-button" onclick="switchView('statistics')">Overview</button>
         <button class="btn btn-ghost nav-button" onclick="switchView('activity')">Activity Feed</button>
         <button class="btn btn-ghost nav-button" id="navCreator" onclick="switchView('creator')">Create New Card</button>
+        <button class="dark-mode-toggle" id="darkToggleDesktop" onclick="toggleDarkMode()" title="Toggle dark mode">&#x1F319;</button>
     </div>
 
     <div class="main-content">
@@ -2068,7 +2236,7 @@
                 <!-- Section Divider -->
                 <div class="section-divider">
                     <h2>All Bingo Cards</h2>
-                    <p style="text-align: center; color: #999; font-style: italic; margin-top: 10px;">Click on any card to view in fullscreen</p>
+                    <p class="statistics-hint">Click on any card to view in fullscreen</p>
                 </div>
 
                 <div id="statisticsGrid">
@@ -2145,6 +2313,31 @@
         let devModeActive = false;
         let currentUserId = null;
         let allUsers = [];
+
+        // Dark mode
+        function toggleDarkMode() {
+            const isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', isDark ? 'true' : 'false');
+            updateDarkModeIcons(isDark);
+        }
+
+        function updateDarkModeIcons(isDark) {
+            const icon = isDark ? '\u2600\uFE0F' : '\u{1F319}';
+            const desktopBtn = document.getElementById('darkToggleDesktop');
+            const mobileBtn = document.getElementById('darkToggleMobile');
+            if (desktopBtn) desktopBtn.textContent = icon;
+            if (mobileBtn) mobileBtn.textContent = icon;
+        }
+
+        // Initialize dark mode from preference
+        (function() {
+            const saved = localStorage.getItem('darkMode');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (saved === 'true' || (saved === null && prefersDark)) {
+                document.body.classList.add('dark-mode');
+                updateDarkModeIcons(true);
+            }
+        })();
 
         // Skeleton Loading Generators
         function skeletonUsers(count = 3) {
