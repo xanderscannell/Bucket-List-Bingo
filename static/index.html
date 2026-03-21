@@ -1629,9 +1629,10 @@
         .leaderboard-item {
             display: flex;
             align-items: center;
-            padding: 10px 12px;
+            gap: 10px;
+            padding: 12px 14px;
             background: var(--cream);
-            border-radius: 4px;
+            border-radius: 6px;
             border: 1px solid var(--cream-dark);
             transition: all 0.2s;
         }
@@ -1642,39 +1643,74 @@
             box-shadow: 2px 2px 6px var(--paper-shadow);
         }
 
-        .leaderboard-rank {
-            font-size: 1.2em;
+        /* Top 3 items get subtle highlight */
+        .leaderboard-item:nth-child(1) {
+            background: rgba(212, 160, 60, 0.08);
+            border-color: var(--golden-light);
+        }
+
+        .leaderboard-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8em;
             font-weight: 800;
-            color: var(--sage);
-            min-width: 35px;
+            flex-shrink: 0;
+        }
+
+        .leaderboard-rank {
+            font-size: 1.1em;
+            font-weight: 800;
+            min-width: 28px;
             text-align: center;
-            font-family: var(--font-body);
+            flex-shrink: 0;
         }
 
-        .leaderboard-item:nth-child(1) .leaderboard-rank {
-            color: var(--golden);
-        }
+        /* Medal emojis for top 3 */
+        .leaderboard-item:nth-child(1) .leaderboard-rank { font-size: 1.3em; }
+        .leaderboard-item:nth-child(2) .leaderboard-rank { font-size: 1.3em; }
+        .leaderboard-item:nth-child(3) .leaderboard-rank { font-size: 1.3em; }
 
-        .leaderboard-item:nth-child(2) .leaderboard-rank {
-            color: #a0a0a0;
-        }
-
-        .leaderboard-item:nth-child(3) .leaderboard-rank {
-            color: #cd7f32;
+        .leaderboard-info {
+            flex: 1;
+            min-width: 0;
         }
 
         .leaderboard-name {
-            flex: 1;
             font-weight: 600;
             color: var(--ink);
             font-family: var(--font-display);
             font-size: 1.15em;
         }
 
+        .leaderboard-progress-bar {
+            height: 5px;
+            background: var(--cream-dark);
+            border-radius: 3px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .leaderboard-progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: var(--sage);
+            transition: width 0.5s ease;
+        }
+
+        .leaderboard-item:nth-child(1) .leaderboard-progress-fill {
+            background: var(--golden);
+        }
+
         .leaderboard-score {
             font-weight: 700;
             color: var(--terracotta);
             font-size: 1.1em;
+            flex-shrink: 0;
         }
 
         .section-divider {
@@ -2961,11 +2997,10 @@
 
         // Render a leaderboard
         function renderLeaderboard(container, userStats, sortKey, formatScore) {
-            // Filter out users with 0 points in this category
+            const medals = ['\u{1F947}', '\u{1F948}', '\u{1F949}']; // gold, silver, bronze
             const filteredUsers = userStats.filter(user => user[sortKey] > 0);
-
-            // Sort users by the given key in descending order
             const sortedUsers = [...filteredUsers].sort((a, b) => b[sortKey] - a[sortKey]);
+            const maxValue = sortKey === 'itemsCompleted' ? 24 : (sortedUsers[0]?.[sortKey] || 1);
 
             container.innerHTML = '';
 
@@ -2976,12 +3011,25 @@
 
             sortedUsers.forEach((userStat, index) => {
                 const rank = index + 1;
+                const colorIdx = userColorIndex(userStat.name);
+                const initial = userStat.name.charAt(0).toUpperCase();
+                const colors = ['var(--terracotta)', 'var(--sage)', 'var(--golden)', 'var(--dusty-rose)'];
+                const pct = sortKey === 'itemsCompleted'
+                    ? Math.round((userStat[sortKey] / 24) * 100)
+                    : Math.round((userStat[sortKey] / maxValue) * 100);
+
                 const item = document.createElement('div');
                 item.className = 'leaderboard-item';
 
                 item.innerHTML = `
-                    <span class="leaderboard-rank">#${rank}</span>
-                    <span class="leaderboard-name">${userStat.name}</span>
+                    <span class="leaderboard-rank">${rank <= 3 ? medals[rank - 1] : '#' + rank}</span>
+                    <div class="leaderboard-avatar" style="background:${colors[colorIdx]}">${initial}</div>
+                    <div class="leaderboard-info">
+                        <div class="leaderboard-name">${userStat.name}</div>
+                        <div class="leaderboard-progress-bar">
+                            <div class="leaderboard-progress-fill" style="width:${pct}%"></div>
+                        </div>
+                    </div>
                     <span class="leaderboard-score">${formatScore(userStat[sortKey])}</span>
                 `;
 
