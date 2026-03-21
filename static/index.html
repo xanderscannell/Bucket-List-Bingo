@@ -1181,6 +1181,161 @@
             font-family: var(--font-display);
         }
 
+        /* ── Skeleton Loading System ── */
+        @keyframes skeleton-shimmer {
+            0% { background-position: -400px 0; }
+            100% { background-position: 400px 0; }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, var(--cream-dark) 25%, var(--cream) 50%, var(--cream-dark) 75%);
+            background-size: 800px 100%;
+            animation: skeleton-shimmer 1.5s ease-in-out infinite;
+            border-radius: 4px;
+        }
+
+        .skeleton-text {
+            height: 14px;
+            margin-bottom: 8px;
+            width: 80%;
+        }
+
+        .skeleton-text-short {
+            height: 14px;
+            margin-bottom: 8px;
+            width: 50%;
+        }
+
+        .skeleton-heading {
+            height: 20px;
+            margin-bottom: 12px;
+            width: 60%;
+        }
+
+        /* Skeleton: User card */
+        .skeleton-user-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 20px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border: 2px solid var(--kraft-light);
+        }
+
+        .skeleton-user-info {
+            flex: 1;
+        }
+
+        .skeleton-user-btn {
+            width: 70px;
+            height: 32px;
+        }
+
+        /* Skeleton: Leaderboard row */
+        .skeleton-leaderboard-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--cream-dark);
+        }
+
+        .skeleton-rank {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+        }
+
+        .skeleton-name {
+            height: 16px;
+            flex: 1;
+        }
+
+        .skeleton-score {
+            width: 40px;
+            height: 16px;
+        }
+
+        /* Skeleton: Activity card */
+        .skeleton-activity-card {
+            display: flex;
+            gap: 15px;
+            padding: 18px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border: 2px solid var(--kraft-light);
+        }
+
+        .skeleton-thumbnail {
+            width: 100px;
+            height: 80px;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .skeleton-activity-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Skeleton: Statistics mini card */
+        .skeleton-stats-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            border: 2px solid var(--kraft-light);
+        }
+
+        .skeleton-mini-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 3px;
+            margin-top: 10px;
+        }
+
+        .skeleton-mini-cell {
+            aspect-ratio: 1;
+            border-radius: 2px;
+        }
+
+        /* Skeleton: Statistics grid layout (matches .statistics-grid) */
+        .skeleton-statistics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        /* Spinner for inline/button use */
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid var(--cream-dark);
+            border-top-color: var(--terracotta);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .btn.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .btn.loading .spinner {
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        /* ── End Skeleton Loading System ── */
+
         /* Hamburger Menu Button - Mobile Only */
         .hamburger-menu {
             position: fixed;
@@ -1837,6 +1992,53 @@
         let currentUserId = null;
         let allUsers = [];
 
+        // Skeleton Loading Generators
+        function skeletonUsers(count = 3) {
+            return Array.from({ length: count }, () => `
+                <div class="skeleton-user-card">
+                    <div class="skeleton-user-info">
+                        <div class="skeleton skeleton-heading" style="width:${40 + Math.random() * 30}%"></div>
+                        <div class="skeleton skeleton-text-short"></div>
+                    </div>
+                    <div class="skeleton skeleton-user-btn"></div>
+                </div>
+            `).join('');
+        }
+
+        function skeletonLeaderboard(count = 3) {
+            return Array.from({ length: count }, () => `
+                <div class="skeleton-leaderboard-item">
+                    <div class="skeleton skeleton-rank"></div>
+                    <div class="skeleton skeleton-name" style="width:${50 + Math.random() * 30}%"></div>
+                    <div class="skeleton skeleton-score"></div>
+                </div>
+            `).join('');
+        }
+
+        function skeletonActivityFeed(count = 3) {
+            return Array.from({ length: count }, () => `
+                <div class="skeleton-activity-card">
+                    <div class="skeleton skeleton-thumbnail"></div>
+                    <div class="skeleton-activity-content">
+                        <div class="skeleton skeleton-text-short"></div>
+                        <div class="skeleton skeleton-text" style="width:${60 + Math.random() * 30}%"></div>
+                        <div class="skeleton skeleton-text-short" style="width:30%"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function skeletonStatsGrid(count = 4) {
+            return '<div class="skeleton-statistics-grid">' + Array.from({ length: count }, () => `
+                <div class="skeleton-stats-card">
+                    <div class="skeleton skeleton-heading" style="width:${40 + Math.random() * 30}%"></div>
+                    <div class="skeleton-mini-grid">
+                        ${Array.from({ length: 25 }, () => '<div class="skeleton skeleton-mini-cell"></div>').join('')}
+                    </div>
+                </div>
+            `).join('') + '</div>';
+        }
+
         // API Helper Functions
         async function apiRequest(endpoint, options = {}) {
             const url = `${API_BASE}/api${endpoint}`;
@@ -2089,8 +2291,9 @@
 
         // Render users list
         async function renderUsersList() {
-            const users = await getAllUsers();
             const usersList = document.getElementById('usersList');
+            usersList.innerHTML = skeletonUsers(3);
+            const users = await getAllUsers();
             const currentId = getCurrentUserId();
 
             if (users.length === 0) {
@@ -2809,9 +3012,9 @@
             const itemsLeaderboard = document.getElementById('itemsLeaderboard');
             const bingosLeaderboard = document.getElementById('bingosLeaderboard');
 
-            statisticsGrid.innerHTML = '<div class="loading-message">Loading overview...</div>';
-            itemsLeaderboard.innerHTML = '<div class="loading-message">Loading...</div>';
-            bingosLeaderboard.innerHTML = '<div class="loading-message">Loading...</div>';
+            statisticsGrid.innerHTML = skeletonStatsGrid(4);
+            itemsLeaderboard.innerHTML = skeletonLeaderboard(3);
+            bingosLeaderboard.innerHTML = skeletonLeaderboard(3);
 
             try {
                 const users = await getAllUsers();
@@ -3139,6 +3342,12 @@
             const userId = getCurrentUserId();
             const date = document.getElementById('completionDate').value;
             const notes = document.getElementById('completionNotes').value;
+            const saveBtn = document.getElementById('saveDetailsBtn');
+
+            // Show loading state on save button
+            const originalText = saveBtn.textContent;
+            saveBtn.classList.add('loading');
+            saveBtn.innerHTML = '<span class="spinner"></span> Saving...';
 
             try {
                 // Save details to API
@@ -3164,6 +3373,9 @@
             } catch (error) {
                 console.error('Error saving completion details:', error);
                 alert('Failed to save details. Please try again. Error: ' + error.message);
+            } finally {
+                saveBtn.classList.remove('loading');
+                saveBtn.textContent = originalText;
             }
         }
 
@@ -3367,11 +3579,13 @@
 
         // Activity Feed Functions
         async function loadActivityFeed() {
+            const container = document.getElementById('activityFeedContainer');
+            const emptyState = document.getElementById('activityEmptyState');
+            emptyState.style.display = 'none';
+            container.innerHTML = skeletonActivityFeed(3);
+
             try {
                 const activities = await apiRequest('/activity/feed');
-
-                const container = document.getElementById('activityFeedContainer');
-                const emptyState = document.getElementById('activityEmptyState');
 
                 if (activities.length === 0) {
                     container.innerHTML = '';
