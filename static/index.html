@@ -94,43 +94,163 @@
             flex-wrap: wrap;
         }
 
-        .nav-button {
+        /* ── Button Design System ── */
+        .btn {
+            display: inline-block;
             padding: 10px 18px;
-            background: var(--cream);
-            color: var(--ink);
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.85em;
             font-weight: 700;
             font-family: var(--font-body);
-            transition: all 0.2s ease;
-            box-shadow: 2px 2px 0 var(--kraft-dark), inset 0 1px 0 white;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            line-height: 1.2;
         }
 
-        .nav-button:hover {
-            background: white;
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Variant: Primary (terracotta) */
+        .btn-primary {
+            background: var(--terracotta);
+            color: white;
+            box-shadow: 2px 2px 0 #8b3a22;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background: var(--terracotta-light);
             transform: translate(-1px, -1px);
-            box-shadow: 3px 3px 0 var(--kraft-dark), inset 0 1px 0 white;
+            box-shadow: 3px 3px 0 #8b3a22;
+        }
+        .btn-primary:active:not(:disabled) {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0 #8b3a22;
         }
 
-        .nav-button:active {
+        /* Variant: Secondary (sage) */
+        .btn-secondary {
+            background: var(--sage);
+            color: white;
+            box-shadow: 2px 2px 0 var(--sage-dark);
+        }
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--sage-light);
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0 var(--sage-dark);
+        }
+        .btn-secondary:active:not(:disabled) {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0 var(--sage-dark);
+        }
+
+        /* Variant: Danger (dusty rose) */
+        .btn-danger {
+            background: var(--dusty-rose);
+            color: white;
+            box-shadow: 2px 2px 0 #8b5a55;
+        }
+        .btn-danger:hover:not(:disabled) {
+            background: var(--dusty-rose-light);
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0 #8b5a55;
+        }
+        .btn-danger:active:not(:disabled) {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0 #8b5a55;
+        }
+
+        /* Variant: Accent (golden) */
+        .btn-accent {
+            background: var(--golden);
+            color: white;
+            box-shadow: 2px 2px 0 var(--kraft-dark);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        .btn-accent:hover:not(:disabled) {
+            background: var(--golden-light);
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0 var(--kraft-dark);
+        }
+        .btn-accent:active:not(:disabled) {
             transform: translate(1px, 1px);
             box-shadow: 1px 1px 0 var(--kraft-dark);
         }
 
-        .nav-button.active {
+        /* Variant: Ghost (cream/transparent) */
+        .btn-ghost {
+            background: var(--cream);
+            color: var(--ink);
+            box-shadow: 2px 2px 0 var(--kraft-dark), inset 0 1px 0 white;
+        }
+        .btn-ghost:hover:not(:disabled) {
+            background: white;
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0 var(--kraft-dark), inset 0 1px 0 white;
+        }
+        .btn-ghost:active:not(:disabled) {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0 var(--kraft-dark);
+        }
+
+        /* Ghost active state (for nav highlighting) */
+        .btn-ghost.active {
             background: var(--terracotta);
             color: white;
             box-shadow: 2px 2px 0 var(--kraft-dark), inset 0 1px 0 var(--terracotta-light);
         }
-
-        .nav-button.active:hover {
+        .btn-ghost.active:hover:not(:disabled) {
             background: var(--terracotta-light);
             color: white;
         }
+
+        /* Variant: Outline (border only, for secondary modal actions) */
+        .btn-outline {
+            background: white;
+            color: var(--terracotta);
+            border: 2px solid var(--terracotta);
+            box-shadow: none;
+        }
+        .btn-outline:hover:not(:disabled) {
+            background: var(--cream);
+        }
+
+        /* Size: Small */
+        .btn-sm {
+            padding: 8px 15px;
+            font-size: 0.8em;
+        }
+
+        /* Size: Large — amplifies shadow depth from any variant */
+        .btn-lg {
+            padding: 16px 20px;
+            font-size: 1.1em;
+            letter-spacing: 1px;
+        }
+        .btn-lg:hover:not(:disabled) {
+            transform: translate(-2px, -2px);
+        }
+        .btn-lg:active:not(:disabled) {
+            transform: translate(1px, 1px);
+        }
+
+        /* Size: Block (full-width) */
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        /* Layout helper: flex-fill button (for modal action rows) */
+        .btn-fill {
+            flex: 1;
+        }
+
+        /* ── End Button Design System ── */
 
         /* Hide conditional nav buttons by default to prevent flash on load */
         #navCreator,
@@ -300,67 +420,7 @@
             flex-wrap: wrap;
         }
 
-        .reset-button, .print-button, .clear-button {
-            padding: 10px 18px;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 0.85em;
-            cursor: pointer;
-            font-weight: 700;
-            font-family: var(--font-body);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: all 0.2s ease;
-        }
-
-        .reset-button {
-            background: var(--sage);
-            box-shadow: 2px 2px 0 var(--sage-dark);
-        }
-
-        .reset-button:hover {
-            background: var(--sage-light);
-            transform: translate(-1px, -1px);
-            box-shadow: 3px 3px 0 var(--sage-dark);
-        }
-
-        .reset-button:active {
-            transform: translate(1px, 1px);
-            box-shadow: 1px 1px 0 var(--sage-dark);
-        }
-
-        .print-button {
-            background: var(--terracotta);
-            box-shadow: 2px 2px 0 #8b3a22;
-        }
-
-        .print-button:hover {
-            background: var(--terracotta-light);
-            transform: translate(-1px, -1px);
-            box-shadow: 3px 3px 0 #8b3a22;
-        }
-
-        .print-button:active {
-            transform: translate(1px, 1px);
-            box-shadow: 1px 1px 0 #8b3a22;
-        }
-
-        .clear-button {
-            background: var(--dusty-rose);
-            box-shadow: 2px 2px 0 #8b5a55;
-        }
-
-        .clear-button:hover {
-            background: var(--dusty-rose-light);
-            transform: translate(-1px, -1px);
-            box-shadow: 3px 3px 0 #8b5a55;
-        }
-
-        .clear-button:active {
-            transform: translate(1px, 1px);
-            box-shadow: 1px 1px 0 #8b5a55;
-        }
+        /* Action buttons — now using .btn system */
 
         /* Tablet and larger screens */
         @media (min-width: 600px) {
@@ -566,71 +626,9 @@
             box-shadow: 0 0 0 3px rgba(125, 154, 120, 0.15);
         }
 
-        .create-button {
-            display: block;
-            width: 100%;
-            padding: 16px 20px;
-            background: var(--terracotta);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 1.1em;
-            font-weight: 700;
-            font-family: var(--font-body);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 3px 3px 0 #8b3a22;
-        }
-
-        .create-button:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: 5px 5px 0 #8b3a22;
-            background: var(--terracotta-light);
-        }
-
-        .create-button:active {
-            transform: translate(1px, 1px);
-            box-shadow: 2px 2px 0 #8b3a22;
-        }
-
+        /* Create & Randomize buttons — now using .btn system */
         .randomize-button {
-            display: block;
-            width: 100%;
-            padding: 16px 20px;
-            background: var(--golden);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 1.1em;
-            font-weight: 700;
-            font-family: var(--font-body);
-            cursor: pointer;
-            transition: all 0.2s ease;
             margin-top: 20px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 3px 3px 0 var(--kraft-dark);
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-        }
-
-        .randomize-button:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: 5px 5px 0 var(--kraft-dark);
-            background: var(--golden-light);
-        }
-
-        .randomize-button:active {
-            transform: translate(1px, 1px);
-            box-shadow: 2px 2px 0 var(--kraft-dark);
-        }
-
-        .randomize-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: 2px 2px 0 var(--kraft-dark);
         }
 
         .helper-text {
@@ -662,30 +660,10 @@
             font-family: var(--font-display);
         }
 
+        /* Dev buttons — now using .btn system */
         .dev-button {
-            padding: 8px 15px;
-            background: var(--sage);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 0.85em;
-            cursor: pointer;
             margin-right: 10px;
             margin-bottom: 10px;
-            font-family: var(--font-body);
-            font-weight: 600;
-            box-shadow: 2px 2px 0 var(--sage-dark);
-            transition: all 0.2s ease;
-        }
-
-        .dev-button:hover {
-            transform: translate(-1px, -1px);
-            box-shadow: 3px 3px 0 var(--sage-dark);
-        }
-
-        .dev-button:active {
-            transform: translate(1px, 1px);
-            box-shadow: 1px 1px 0 var(--sage-dark);
         }
 
         /* Modal styles */
@@ -889,53 +867,7 @@
             margin-top: 20px;
         }
 
-        .modal-button {
-            flex: 1;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 4px;
-            font-size: 1em;
-            font-weight: 700;
-            font-family: var(--font-body);
-            cursor: pointer;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .modal-button-primary {
-            background: var(--sage);
-            color: white;
-            box-shadow: 2px 2px 0 var(--sage-dark);
-        }
-
-        .modal-button-primary:hover {
-            transform: translate(-1px, -1px);
-            box-shadow: 3px 3px 0 var(--sage-dark);
-            background: var(--sage-light);
-        }
-
-        .modal-button-secondary {
-            background: var(--cream);
-            color: var(--ink);
-            box-shadow: 2px 2px 0 var(--cream-dark);
-        }
-
-        .modal-button-secondary:hover {
-            background: white;
-            transform: translate(-1px, -1px);
-            box-shadow: 3px 3px 0 var(--cream-dark);
-        }
-
-        .modal-button-quick {
-            background: white;
-            color: var(--terracotta);
-            border: 2px solid var(--terracotta);
-        }
-
-        .modal-button-quick:hover {
-            background: var(--cream);
-        }
+        /* Modal buttons — now using .btn system */
 
         .cell-has-details {
             position: relative;
@@ -1223,28 +1155,7 @@
             gap: 10px;
         }
 
-        .delete-user-btn {
-            padding: 8px 15px;
-            background: var(--dusty-rose);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8em;
-            font-family: var(--font-body);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: all 0.2s;
-            box-shadow: 2px 2px 0 #8b5a55;
-        }
-
-        .delete-user-btn:hover {
-            background: var(--dusty-rose-light);
-            transform: translate(-1px, -1px);
-            box-shadow: 3px 3px 0 #8b5a55;
-        }
-
+        /* Delete button — now using .btn system, with active card override */
         .user-card.active .delete-user-btn {
             background: rgba(255, 255, 255, 0.25);
             color: white;
@@ -1329,19 +1240,10 @@
             text-align: left;
             padding: 14px 18px;
             font-size: 0.95em;
-            background: var(--cream);
-            color: var(--ink);
-            border: none;
             box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
         }
 
-        .sidebar .nav-button:hover {
-            background: white;
-        }
-
         .sidebar .nav-button.active {
-            background: var(--terracotta);
-            color: white;
             box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
         }
 
@@ -1756,22 +1658,22 @@
 
     <!-- Sidebar -->
     <div class="sidebar no-print" id="sidebar">
-        <button class="nav-button" onclick="switchView('users'); closeSidebar();">Switch User</button>
-        <button class="nav-button" id="navCardMobile" onclick="switchView('card'); closeSidebar();">My Bingo Card</button>
-        <button class="nav-button" onclick="switchView('statistics'); closeSidebar();">Overview</button>
-        <button class="nav-button" onclick="switchView('activity'); closeSidebar();">Activity Feed</button>
-        <button class="nav-button" id="navCreatorMobile" onclick="switchView('creator'); closeSidebar();">Create New Card</button>
+        <button class="btn btn-ghost nav-button" onclick="switchView('users'); closeSidebar();">Switch User</button>
+        <button class="btn btn-ghost nav-button" id="navCardMobile" onclick="switchView('card'); closeSidebar();">My Bingo Card</button>
+        <button class="btn btn-ghost nav-button" onclick="switchView('statistics'); closeSidebar();">Overview</button>
+        <button class="btn btn-ghost nav-button" onclick="switchView('activity'); closeSidebar();">Activity Feed</button>
+        <button class="btn btn-ghost nav-button" id="navCreatorMobile" onclick="switchView('creator'); closeSidebar();">Create New Card</button>
     </div>
 
     <!-- Backdrop -->
     <div class="sidebar-backdrop no-print" id="sidebarBackdrop" onclick="closeSidebar()"></div>
 
     <div class="navbar no-print">
-        <button class="nav-button" onclick="switchView('users')">Switch User</button>
-        <button class="nav-button" id="navCard" onclick="switchView('card')">My Bingo Card</button>
-        <button class="nav-button" onclick="switchView('statistics')">Overview</button>
-        <button class="nav-button" onclick="switchView('activity')">Activity Feed</button>
-        <button class="nav-button" id="navCreator" onclick="switchView('creator')">Create New Card</button>
+        <button class="btn btn-ghost nav-button" onclick="switchView('users')">Switch User</button>
+        <button class="btn btn-ghost nav-button" id="navCard" onclick="switchView('card')">My Bingo Card</button>
+        <button class="btn btn-ghost nav-button" onclick="switchView('statistics')">Overview</button>
+        <button class="btn btn-ghost nav-button" onclick="switchView('activity')">Activity Feed</button>
+        <button class="btn btn-ghost nav-button" id="navCreator" onclick="switchView('creator')">Create New Card</button>
     </div>
 
     <div class="main-content">
@@ -1791,23 +1693,23 @@
                     <span class="no-print">Your progress is synced automatically across all devices.</span>
                 </div>
 
-                <button class="randomize-button no-print" onclick="visualRandomizeCard()">Randomize!</button>
+                <button class="btn btn-accent btn-lg btn-block randomize-button no-print" onclick="visualRandomizeCard()">Randomize!</button>
 
                 <div class="buttons">
-                    <button class="print-button" onclick="window.print()">Print</button>
-                    <button class="reset-button" onclick="resetProgress()">Reset All Progress</button>
-                    <button class="clear-button" onclick="clearBingoCard()">Clear Bingo Card</button>
+                    <button class="btn btn-primary" onclick="window.print()">Print</button>
+                    <button class="btn btn-secondary" onclick="resetProgress()">Reset All Progress</button>
+                    <button class="btn btn-danger" onclick="clearBingoCard()">Clear Bingo Card</button>
                 </div>
 
                 <!-- Dev Mode Panel (hidden by default) -->
                 <div id="devPanel" class="dev-panel no-print">
                     <h3>Developer Mode</h3>
-                    <button class="dev-button" onclick="visualRandomizeCard()">Visual Randomizer</button>
-                    <button class="dev-button" onclick="randomizeCard()">Instant Randomize</button>
-                    <button class="dev-button" onclick="fillAllItems()">Fill Random Items</button>
-                    <button class="dev-button" onclick="exportData()">Export Data (JSON)</button>
-                    <button class="dev-button" onclick="importData()">Import Data (JSON)</button>
-                    <button class="dev-button" onclick="toggleDevMode()">Close Dev Mode</button>
+                    <button class="btn btn-secondary btn-sm dev-button" onclick="visualRandomizeCard()">Visual Randomizer</button>
+                    <button class="btn btn-secondary btn-sm dev-button" onclick="randomizeCard()">Instant Randomize</button>
+                    <button class="btn btn-secondary btn-sm dev-button" onclick="fillAllItems()">Fill Random Items</button>
+                    <button class="btn btn-secondary btn-sm dev-button" onclick="exportData()">Export Data (JSON)</button>
+                    <button class="btn btn-secondary btn-sm dev-button" onclick="importData()">Import Data (JSON)</button>
+                    <button class="btn btn-secondary btn-sm dev-button" onclick="toggleDevMode()">Close Dev Mode</button>
                 </div>
             </div>
         </div>
@@ -1823,7 +1725,7 @@
                 </div>
 
                 <div style="text-align: center; margin-top: 30px;">
-                    <button class="create-button" onclick="switchView('creator')">Create New User</button>
+                    <button class="btn btn-primary btn-lg btn-block" onclick="switchView('creator')">Create New User</button>
                 </div>
             </div>
         </div>
@@ -1904,7 +1806,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="create-button">Create My Bingo Card</button>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">Create My Bingo Card</button>
 
                     <div class="helper-text">
                         The center space will automatically be a FREE SPACE
@@ -1914,13 +1816,13 @@
                 <!-- Dev Mode Panel (hidden by default) -->
                 <div id="devPanelCreator" class="dev-panel no-print">
                     <h3>Developer Mode</h3>
-                    <button class="dev-button" onclick="visualRandomizeCard()">Visual Randomizer</button>
-                    <button class="dev-button" onclick="randomizeCard()">Instant Randomize</button>
-                    <button class="dev-button" onclick="fillAllItems()">Fill Random Items</button>
-                    <button class="dev-button" onclick="exportData()">Export Data (JSON)</button>
-                    <button class="dev-button" onclick="importData()">Import Data (JSON)</button>
-                    <button class="dev-button" onclick="fillFormWithSamples()">Fill Form with Samples</button>
-                    <button class="dev-button" onclick="toggleDevMode()">Close Dev Mode</button>
+                    <button class="btn btn-secondary btn-sm dev-button" onclick="visualRandomizeCard()">Visual Randomizer</button>
+                    <button class="btn btn-secondary btn-sm dev-button" onclick="randomizeCard()">Instant Randomize</button>
+                    <button class="btn btn-secondary btn-sm dev-button" onclick="fillAllItems()">Fill Random Items</button>
+                    <button class="btn btn-secondary btn-sm dev-button" onclick="exportData()">Export Data (JSON)</button>
+                    <button class="btn btn-secondary btn-sm dev-button" onclick="importData()">Import Data (JSON)</button>
+                    <button class="btn btn-secondary btn-sm dev-button" onclick="fillFormWithSamples()">Fill Form with Samples</button>
+                    <button class="btn btn-secondary btn-sm dev-button" onclick="toggleDevMode()">Close Dev Mode</button>
                 </div>
             </div>
         </div>
@@ -2205,7 +2107,7 @@
                             <p>Created: ${new Date(user.createdAt).toLocaleDateString()}</p>
                         </div>
                         <div class="user-actions">
-                            <button class="delete-user-btn" onclick="event.stopPropagation(); confirmDeleteUser('${user.id}', '${user.name}')">Delete</button>
+                            <button class="btn btn-danger btn-sm delete-user-btn" onclick="event.stopPropagation(); confirmDeleteUser('${user.id}', '${user.name}')">Delete</button>
                         </div>
                     </div>
                 `;
@@ -3653,11 +3555,11 @@
                 </div>
             </div>
             <div class="modal-actions">
-                <button class="modal-button modal-button-secondary" onclick="closeCompletionModal()">Cancel</button>
-                <button class="modal-button modal-button-primary" id="saveDetailsBtn" onclick="saveCompletionDetails()">Save & Mark Complete</button>
+                <button class="btn btn-ghost btn-fill" onclick="closeCompletionModal()">Cancel</button>
+                <button class="btn btn-secondary btn-fill" id="saveDetailsBtn" onclick="saveCompletionDetails()">Save & Mark Complete</button>
             </div>
             <div class="modal-actions" id="unmarkSection" style="display: none; margin-top: 10px;">
-                <button class="modal-button modal-button-secondary" onclick="unmarkCell()" style="background: #ff6b6b; color: white;">Unmark This Item</button>
+                <button class="btn btn-danger btn-fill" onclick="unmarkCell()">Unmark This Item</button>
             </div>
         </div>
     </div>
