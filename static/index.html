@@ -1667,7 +1667,7 @@
         }
 
         .mini-free-space {
-            background: var(--golden);
+            background: linear-gradient(135deg, var(--golden) 0%, var(--golden-light) 50%, var(--golden) 100%);
             color: white;
             font-size: 0.60rem;
             border-color: var(--kraft-dark);
@@ -2101,6 +2101,16 @@
             background: #352e25;
         }
 
+        .dark-mode .btn-ghost.active {
+            background: var(--terracotta);
+            color: white;
+        }
+
+        .dark-mode .btn-ghost.active:hover:not(:disabled) {
+            background: var(--terracotta-light);
+            color: white;
+        }
+
         .dark-mode .modal-zone {
             background: #1a1612;
         }
@@ -2143,11 +2153,8 @@
         }
 
         .dark-mode .hamburger-menu {
-            background: #2a231c;
-        }
-
-        .dark-mode .hamburger-menu span {
-            background: var(--ink);
+            background: #d4a03c;
+            color: #1a1612;
         }
 
         .dark-mode .fullscreen-card-container {
