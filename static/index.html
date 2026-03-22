@@ -3666,13 +3666,15 @@
             dateInput.disabled = false;
             notesInput.disabled = false;
             saveDetailsBtn.style.display = 'block';
-            photoInput.parentElement.style.display = 'block';
+            document.querySelector('.photo-upload-area').style.display = '';
 
             // Reset labels to default
-            const photoLabel = dateInput.parentElement.nextElementSibling?.querySelector('label');
-            const notesLabel = notesInput.parentElement?.querySelector('label');
-            if (photoLabel) photoLabel.textContent = '📷 Photos (Optional)';
-            if (notesLabel) notesLabel.textContent = '📝 Notes & Story (Optional)';
+            const modalBody = document.querySelector('#completionModal .modal-body');
+            const labels = modalBody.querySelectorAll('label');
+            labels.forEach(l => {
+                if (l.textContent.includes('Photos')) l.textContent = '📷 Photos (Optional)';
+                if (l.textContent.includes('Notes')) l.textContent = '📝 Notes & Story (Optional)';
+            });
         }
 
         // Handle photo upload
@@ -4079,15 +4081,17 @@
             uploadedPhotos = details.photos || [];
 
             // Update labels to remove "(Optional)"
-            const photoLabel = dateInput.parentElement.nextElementSibling.querySelector('label');
-            const notesLabel = notesInput.parentElement.querySelector('label');
-            photoLabel.textContent = '📷 Photos';
-            notesLabel.textContent = '📝 Notes & Story';
+            const modalBody = modal.querySelector('.modal-body');
+            const labels = modalBody.querySelectorAll('label');
+            labels.forEach(l => {
+                if (l.textContent.includes('Photos')) l.textContent = '📷 Photos';
+                if (l.textContent.includes('Notes')) l.textContent = '📝 Notes & Story';
+            });
 
             // Hide action buttons and photo upload
             saveDetailsBtn.style.display = 'none';
             unmarkSection.style.display = 'none';
-            photoInput.parentElement.style.display = 'none';
+            document.querySelector('.photo-upload-area').style.display = 'none';
 
             // Render photos
             photoPreviewGrid.innerHTML = '';
@@ -4219,13 +4223,15 @@
             notesInput.disabled = true;
             saveDetailsBtn.style.display = 'none';
             unmarkSection.style.display = 'none';
-            photoInput.parentElement.style.display = 'none';
+            document.querySelector('.photo-upload-area').style.display = 'none';
 
             // Update labels to indicate read-only
-            const photoLabel = dateInput.parentElement.nextElementSibling.querySelector('label');
-            const notesLabel = notesInput.parentElement.querySelector('label');
-            photoLabel.textContent = '📷 Photos';
-            notesLabel.textContent = '📝 Notes & Story';
+            const modalBody = modal.querySelector('.modal-body');
+            const labels = modalBody.querySelectorAll('label');
+            labels.forEach(l => {
+                if (l.textContent.includes('Photos')) l.textContent = '📷 Photos';
+                if (l.textContent.includes('Notes')) l.textContent = '📝 Notes & Story';
+            });
 
             // Render photos
             uploadedPhotos = cellDetails.photos || [];
