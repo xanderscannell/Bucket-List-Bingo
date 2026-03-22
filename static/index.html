@@ -352,7 +352,7 @@
             justify-content: center;
             text-align: center;
             padding: 4px;
-            font-size: clamp(0.42rem, 2.3vw, 0.8rem) !important;
+            font-size: clamp(0.55rem, 1.8vw, 0.85rem);
             background: white;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -433,7 +433,7 @@
             background: linear-gradient(135deg, var(--golden) 0%, var(--golden-light) 50%, var(--golden) 100%);
             color: white;
             font-weight: 700;
-            font-size: clamp(0.45rem, 2vw, 0.85rem) !important;
+            font-size: clamp(0.55rem, 1.8vw, 0.85rem);
             cursor: default;
             border-color: var(--kraft-dark);
             text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
@@ -1626,7 +1626,7 @@
             justify-content: center;
             text-align: center;
             padding: 2px;
-            font-size: 0.26em;
+            font-size: 0.60rem;
             background: white;
             line-height: 1.05;
             font-weight: 700;
@@ -1669,8 +1669,15 @@
         .mini-free-space {
             background: var(--golden);
             color: white;
-            font-size: 0.35em;
+            font-size: 0.60rem;
             border-color: var(--kraft-dark);
+        }
+
+        @media (min-width: 600px) {
+            .mini-bingo-cell,
+            .mini-free-space {
+                font-size: 0.28rem;
+            }
         }
 
         .user-stats {
