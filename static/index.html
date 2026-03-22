@@ -2160,9 +2160,12 @@
             border-color: #3a3020;
         }
 
-        .dark-mode body,
         .dark-mode {
-            background-blend-mode: overlay;
+            background-image: none;
+        }
+
+        .dark-mode .bingo-card::before {
+            display: none;
         }
 
         /* Dark mode skeleton shimmer */
