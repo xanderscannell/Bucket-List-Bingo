@@ -310,7 +310,7 @@
             width: 120px;
             height: 28px;
             background: linear-gradient(135deg, var(--dusty-rose) 0%, var(--dusty-rose-light) 100%);
-            opacity: 0.85;
+            opacity: 0.55;
             border-radius: 2px;
         }
 
@@ -2148,7 +2148,9 @@
         }
 
         .dark-mode .user-card.active {
-            border-color: var(--terracotta);
+            background: var(--sage);
+            color: white;
+            border-color: var(--sage-dark);
         }
 
         .dark-mode .photo-preview-item {
@@ -3702,8 +3704,10 @@
             saveDetailsBtn.style.display = 'block';
             document.querySelector('.photo-upload-area').style.display = '';
 
-            // Reset labels to default
+            // Reset modal zones visibility and labels
             const modalBody = document.querySelector('#completionModal .modal-body');
+            const zones = modalBody.querySelectorAll('.modal-zone');
+            zones.forEach(z => z.style.display = '');
             const labels = modalBody.querySelectorAll('label');
             labels.forEach(l => {
                 if (l.textContent.includes('Photos')) l.textContent = '📷 Photos (Optional)';
@@ -4114,37 +4118,54 @@
             notesInput.disabled = true;
             uploadedPhotos = details.photos || [];
 
-            // Update labels to remove "(Optional)"
-            const modalBody = modal.querySelector('.modal-body');
-            const labels = modalBody.querySelectorAll('label');
-            labels.forEach(l => {
-                if (l.textContent.includes('Photos')) l.textContent = '📷 Photos';
-                if (l.textContent.includes('Notes')) l.textContent = '📝 Notes & Story';
-            });
-
             // Hide action buttons and photo upload
             saveDetailsBtn.style.display = 'none';
             unmarkSection.style.display = 'none';
             document.querySelector('.photo-upload-area').style.display = 'none';
 
-            // Render photos
-            photoPreviewGrid.innerHTML = '';
-            uploadedPhotos.forEach((photo) => {
-                const previewItem = document.createElement('div');
-                previewItem.className = 'photo-preview-item';
-                previewItem.style.cursor = 'pointer';
+            // Get modal zones: [date, photos, notes]
+            const modalBody = modal.querySelector('.modal-body');
+            const zones = modalBody.querySelectorAll('.modal-zone');
+            const photoZone = zones[1];
+            const notesZone = zones[2];
 
-                const img = document.createElement('img');
-                img.src = photo;
+            // Hide photo section if no photos
+            if (!uploadedPhotos.length) {
+                photoZone.style.display = 'none';
+            } else {
+                photoZone.style.display = '';
+                // Update label
+                const photoLabel = photoZone.querySelector('label');
+                if (photoLabel) photoLabel.textContent = '📷 Photos';
 
-                img.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    viewPhotoFullscreen(photo, uploadedPhotos);
+                // Render photos
+                photoPreviewGrid.innerHTML = '';
+                uploadedPhotos.forEach((photo) => {
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'photo-preview-item';
+                    previewItem.style.cursor = 'pointer';
+
+                    const img = document.createElement('img');
+                    img.src = photo;
+
+                    img.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        viewPhotoFullscreen(photo, uploadedPhotos);
+                    });
+
+                    previewItem.appendChild(img);
+                    photoPreviewGrid.appendChild(previewItem);
                 });
+            }
 
-                previewItem.appendChild(img);
-                photoPreviewGrid.appendChild(previewItem);
-            });
+            // Hide notes section if no notes
+            if (!details.notes) {
+                notesZone.style.display = 'none';
+            } else {
+                notesZone.style.display = '';
+                const notesLabel = notesZone.querySelector('label');
+                if (notesLabel) notesLabel.textContent = '📝 Notes & Story';
+            }
 
             modal.classList.add('active');
         }
@@ -4259,33 +4280,48 @@
             unmarkSection.style.display = 'none';
             document.querySelector('.photo-upload-area').style.display = 'none';
 
-            // Update labels to indicate read-only
+            // Get modal zones: [date, photos, notes]
             const modalBody = modal.querySelector('.modal-body');
-            const labels = modalBody.querySelectorAll('label');
-            labels.forEach(l => {
-                if (l.textContent.includes('Photos')) l.textContent = '📷 Photos';
-                if (l.textContent.includes('Notes')) l.textContent = '📝 Notes & Story';
-            });
+            const zones = modalBody.querySelectorAll('.modal-zone');
+            const photoZone = zones[1];
+            const notesZone = zones[2];
 
-            // Render photos
+            // Render photos or hide section
             uploadedPhotos = cellDetails.photos || [];
-            photoPreviewGrid.innerHTML = '';
-            uploadedPhotos.forEach((photo) => {
-                const previewItem = document.createElement('div');
-                previewItem.className = 'photo-preview-item';
-                previewItem.style.cursor = 'pointer';
+            if (!uploadedPhotos.length) {
+                photoZone.style.display = 'none';
+            } else {
+                photoZone.style.display = '';
+                const photoLabel = photoZone.querySelector('label');
+                if (photoLabel) photoLabel.textContent = '📷 Photos';
 
-                const img = document.createElement('img');
-                img.src = photo;
+                photoPreviewGrid.innerHTML = '';
+                uploadedPhotos.forEach((photo) => {
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'photo-preview-item';
+                    previewItem.style.cursor = 'pointer';
 
-                img.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    viewPhotoFullscreen(photo, uploadedPhotos);
+                    const img = document.createElement('img');
+                    img.src = photo;
+
+                    img.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        viewPhotoFullscreen(photo, uploadedPhotos);
+                    });
+
+                    previewItem.appendChild(img);
+                    photoPreviewGrid.appendChild(previewItem);
                 });
+            }
 
-                previewItem.appendChild(img);
-                photoPreviewGrid.appendChild(previewItem);
-            });
+            // Hide notes section if no notes
+            if (!cellDetails.notes) {
+                notesZone.style.display = 'none';
+            } else {
+                notesZone.style.display = '';
+                const notesLabel = notesZone.querySelector('label');
+                if (notesLabel) notesLabel.textContent = '📝 Notes & Story';
+            }
 
             modal.classList.add('active');
         }

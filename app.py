@@ -270,10 +270,6 @@ def get_activity_feed():
             # The free space (grid position 12) is never stored in cell_details
             item_text = items[cell_index]
 
-            # Skip free space
-            if cell_index == 12:
-                continue
-
             # Get first photo as thumbnail if available
             photos = details.get('photos', [])
             photo_thumbnail = photos[0] if photos else None
