@@ -3904,6 +3904,11 @@
                 currentModalCellElement.classList.remove('cell-has-details');
 
                 await saveProgress();
+
+                // Recalculate bingo line highlights
+                const progress = await getUserProgress();
+                highlightBingoLines(progress ? progress.markedCells : []);
+
                 closeCompletionModal();
             } catch (error) {
                 console.error('Error unmarking cell:', error);
@@ -3958,6 +3963,8 @@
             if (d1.every(pos => grid[pos])) d1.forEach(pos => bingoPositions.add(pos));
             if (d2.every(pos => grid[pos])) d2.forEach(pos => bingoPositions.add(pos));
 
+            // Clear existing bingo-line highlights, then apply current ones
+            cells.forEach(cell => cell.classList.remove('bingo-line'));
             bingoPositions.forEach(pos => {
                 if (cells[pos]) cells[pos].classList.add('bingo-line');
             });
